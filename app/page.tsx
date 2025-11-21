@@ -6,6 +6,7 @@ import { SentimentOrb } from "@/components/oracle/SentimentOrb";
 import { StakeModal } from "@/components/oracle/StakeModal";
 import { OddsTicker } from "@/components/oracle/OddsTicker";
 import { ActivityFeed } from "@/components/oracle/ActivityFeed";
+import { WalletButton } from "@/components/wallet/WalletButton";
 
 export default function HomePage() {
   const [selectedMarket, setSelectedMarket] = useState<any>(null);
@@ -91,9 +92,7 @@ export default function HomePage() {
               Oracle Protocol
             </h1>
           </div>
-          <button className="px-4 py-2 bg-amber-500 hover:bg-amber-600 rounded-lg font-bold text-black transition-colors">
-            Connect Wallet
-          </button>
+          <WalletButton />
         </div>
       </header>
 

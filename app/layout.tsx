@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Orbitron, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { WalletProvider } from "@/components/wallet/WalletProvider";
 
 const orbitron = Orbitron({
   subsets: ["latin"],
@@ -33,7 +34,7 @@ export default function RootLayout({
       <body
         className={`${orbitron.variable} ${inter.variable} ${jetbrainsMono.variable} font-inter antialiased bg-slate-950 text-slate-100`}
       >
-        {children}
+        <WalletProvider>{children}</WalletProvider>
       </body>
     </html>
   );
