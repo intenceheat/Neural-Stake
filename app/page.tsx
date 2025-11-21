@@ -1,54 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MarketCard } from "@/components/oracle/MarketCard";
 import { SentimentOrb } from "@/components/oracle/SentimentOrb";
 import { StakeModal } from "@/components/oracle/StakeModal";
 import { OddsTicker } from "@/components/oracle/OddsTicker";
 import { ActivityFeed } from "@/components/oracle/ActivityFeed";
 import { WalletButton } from "@/components/wallet/WalletButton";
+import { marketService, type Market } from "@/lib/supabase";
 
 export default function HomePage() {
   const [selectedMarket, setSelectedMarket] = useState<any>(null);
   const [isStakeModalOpen, setIsStakeModalOpen] = useState(false);
+  const [markets, setMarkets] = useState<Market[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data
-  const mockMarkets = [
-    {
-      marketId: "jup-1",
-      question: "Will Jupiter (JUP) hit $2.00 by December 31, 2024?",
-      oddsYes: 73,
-      oddsNo: 27,
-      sentiment: 0.82,
-      confidence: 87,
-      volume: 142.5,
-      participants: 67,
-      timeRemaining: "12h 34m",
-    },
-    {
-      marketId: "bonk-1",
-      question: "Will BONK burn 1 trillion tokens this quarter?",
-      oddsYes: 45,
-      oddsNo: 55,
-      sentiment: 0.23,
-      confidence: 65,
-      volume: 89.3,
-      participants: 42,
-      timeRemaining: "3d 8h",
-    },
-    {
-      marketId: "sol-1",
-      question: "Will Solana TPS exceed 10,000 sustained for 1 hour?",
-      oddsYes: 38,
-      oddsNo: 62,
-      sentiment: -0.15,
-      confidence: 72,
-      volume: 156.8,
-      participants: 93,
-      timeRemaining: "5d 2h",
-    },
-  ];
+  // Fetch real markets from Supabase
+  useEffect(() => {
+    async function fetchMarkets() {
+      try {
+        const data = await marketService.getActive();
+        setMarkets(data);
+      } catch (error) {
+        console.error("Error fetching markets:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
 
+    fetchMarkets();
+  }, []);
+
+  // Mock activities (we'll wire this later)
   const mockActivities = [
     {
       id: "1",
@@ -76,10 +59,58 @@ export default function HomePage() {
     },
   ];
 
-  const handleMarketClick = (market: any) => {
+  const handleMarketClick = (market: Market) => {
     setSelectedMarket(market);
     setIsStakeModalOpen(true);
   };
+
+  // Calculate odds from pools
+  const calculateOdds = (market: Market) => {
+    const total = market.pool_yes + market.pool_no;
+    if (total === 0) {
+      return { oddsYes: 50, oddsNo: 50 };
+    }
+    const oddsYes = Math.round((market.pool_yes / total) * 100);
+    const oddsNo = 100 - oddsYes;
+    return { oddsYes, oddsNo };
+  };
+
+  // Format time remaining
+  const getTimeRemaining = (endTime: string) => {
+    const end = new Date(endTime);
+    const now = new Date();
+    const diff = end.getTime() - now.getTime();
+    
+    if (diff <= 0) return "Ended";
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    if (days > 0) return `${days}d ${hours}h`;
+    return `${hours}h`;
+  };
+
+  const featuredMarket = markets[0];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-amber-400 text-2xl font-orbitron">
+          Loading markets...
+        </div>
+      </div>
+    );
+  }
+
+  if (markets.length === 0) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-amber-400 text-2xl font-orbitron">
+          No active markets. Check back soon.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950">
@@ -102,9 +133,9 @@ export default function HomePage() {
           <div className="text-center mb-8">
             <div className="flex justify-center mb-6">
               <SentimentOrb
-                sentimentScore={0.75}
-                confidence={92}
-                volume={450}
+                sentimentScore={featuredMarket.sentiment_score}
+                confidence={featuredMarket.sentiment_confidence}
+                volume={featuredMarket.total_volume}
                 size="xl"
               />
             </div>
@@ -123,15 +154,15 @@ export default function HomePage() {
                 Featured Market
               </h3>
               <p className="text-lg text-white font-bold mb-6">
-                {mockMarkets[0].question}
+                {featuredMarket.question}
               </p>
             </div>
             <OddsTicker
-              oddsYes={mockMarkets[0].oddsYes}
-              oddsNo={mockMarkets[0].oddsNo}
+              oddsYes={calculateOdds(featuredMarket).oddsYes}
+              oddsNo={calculateOdds(featuredMarket).oddsNo}
             />
             <button
-              onClick={() => handleMarketClick(mockMarkets[0])}
+              onClick={() => handleMarketClick(featuredMarket)}
               className="w-full mt-6 py-3 bg-amber-500 hover:bg-amber-600 rounded-lg font-bold text-black transition-all hover:scale-105"
             >
               STAKE NOW →
@@ -141,17 +172,21 @@ export default function HomePage() {
           {/* Stats Row */}
           <div className="flex items-center justify-center gap-6 mb-12">
             <div className="text-center">
-              <div className="text-3xl font-bold text-amber-400">$10K+</div>
-              <div className="text-sm text-slate-500">Prize Pool</div>
+              <div className="text-3xl font-bold text-amber-400">
+                {markets.reduce((sum, m) => sum + m.total_volume, 0).toFixed(1)} SOL
+              </div>
+              <div className="text-sm text-slate-500">Total Volume</div>
             </div>
             <div className="w-px h-12 bg-slate-700" />
             <div className="text-center">
-              <div className="text-3xl font-bold text-amber-400">67</div>
+              <div className="text-3xl font-bold text-amber-400">{markets.length}</div>
               <div className="text-sm text-slate-500">Active Markets</div>
             </div>
             <div className="w-px h-12 bg-slate-700" />
             <div className="text-center">
-              <div className="text-3xl font-bold text-amber-400">1.2K</div>
+              <div className="text-3xl font-bold text-amber-400">
+                {markets.reduce((sum, m) => sum + m.participant_count, 0)}
+              </div>
               <div className="text-sm text-slate-500">Predictors</div>
             </div>
           </div>
@@ -179,13 +214,24 @@ export default function HomePage() {
               </div>
 
               <div className="space-y-4">
-                {mockMarkets.map((market) => (
-                  <MarketCard
-                    key={market.marketId}
-                    {...market}
-                    onClick={() => handleMarketClick(market)}
-                  />
-                ))}
+                {markets.map((market) => {
+                  const odds = calculateOdds(market);
+                  return (
+                    <MarketCard
+                      key={market.id}
+                      marketId={market.market_id}
+                      question={market.question}
+                      oddsYes={odds.oddsYes}
+                      oddsNo={odds.oddsNo}
+                      sentiment={market.sentiment_score}
+                      confidence={market.sentiment_confidence}
+                      volume={market.total_volume}
+                      participants={market.participant_count}
+                      timeRemaining={getTimeRemaining(market.end_time)}
+                      onClick={() => handleMarketClick(market)}
+                    />
+                  );
+                })}
               </div>
             </div>
 
@@ -203,10 +249,10 @@ export default function HomePage() {
           isOpen={isStakeModalOpen}
           onClose={() => setIsStakeModalOpen(false)}
           market={{
-            id: selectedMarket.marketId,
+            id: selectedMarket.market_id,
             question: selectedMarket.question,
-            oddsYes: selectedMarket.oddsYes,
-            oddsNo: selectedMarket.oddsNo,
+            oddsYes: calculateOdds(selectedMarket).oddsYes,
+            oddsNo: calculateOdds(selectedMarket).oddsNo,
           }}
         />
       )}
