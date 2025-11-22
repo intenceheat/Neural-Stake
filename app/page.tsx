@@ -10,26 +10,31 @@ import { WalletButton } from "@/components/wallet/WalletButton";
 import { marketService, type Market } from "@/lib/supabase";
 
 export default function HomePage() {
-  const [selectedMarket, setSelectedMarket] = useState<any>(null);
+  const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [isStakeModalOpen, setIsStakeModalOpen] = useState(false);
   const [markets, setMarkets] = useState<Market[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch real markets from Supabase
   useEffect(() => {
-    async function fetchMarkets() {
-      try {
-        const data = await marketService.getActive();
-        setMarkets(data);
-      } catch (error) {
-        console.error("Error fetching markets:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchMarkets();
   }, []);
+
+  async function fetchMarkets() {
+    try {
+      const data = await marketService.getActive();
+      setMarkets(data);
+    } catch (error) {
+      console.error("Error fetching markets:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Refresh markets after successful stake
+  const refreshMarkets = async () => {
+    await fetchMarkets();
+  };
 
   // Mock activities (we'll wire this later)
   const mockActivities = [
@@ -254,6 +259,7 @@ export default function HomePage() {
             oddsYes: calculateOdds(selectedMarket).oddsYes,
             oddsNo: calculateOdds(selectedMarket).oddsNo,
           }}
+          onSuccess={refreshMarkets}
         />
       )}
     </div>

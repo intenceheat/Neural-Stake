@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Check, AlertCircle } from "lucide-react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { stakingService } from "@/lib/staking";
 
 interface StakeModalProps {
   isOpen: boolean;
@@ -13,13 +15,16 @@ interface StakeModalProps {
     oddsYes: number;
     oddsNo: number;
   };
-  userReputation?: number;
+  onSuccess?: () => void;
 }
 
-export function StakeModal({ isOpen, onClose, market, userReputation = 1.8 }: StakeModalProps) {
+export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalProps) {
+  const { publicKey, connected } = useWallet();
   const [outcome, setOutcome] = useState<"YES" | "NO">("YES");
   const [amount, setAmount] = useState("1.0");
   const [isStaking, setIsStaking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const calculatePayout = () => {
     const stake = parseFloat(amount) || 0;
@@ -40,15 +45,56 @@ export function StakeModal({ isOpen, onClose, market, userReputation = 1.8 }: St
   };
 
   const handleStake = async () => {
+    if (!connected || !publicKey) {
+      setError("Please connect your wallet first");
+      return;
+    }
+
+    const stakeAmount = parseFloat(amount);
+    if (stakeAmount <= 0) {
+      setError("Invalid stake amount");
+      return;
+    }
+
     setIsStaking(true);
-    
-    // Simulate transaction
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsStaking(false);
+    setError(null);
+
+    try {
+      const result = await stakingService.placeStake({
+        userWallet: publicKey.toBase58(),
+        marketId: market.id,
+        outcome: outcome.toLowerCase() as 'yes' | 'no',
+        stakeAmount: stakeAmount,
+      });
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to place stake');
+      }
+
+      // Show success state
+      setSuccess(true);
+
+      // Wait 2 seconds then close and refresh
+      setTimeout(() => {
+        setSuccess(false);
+        onClose();
+        if (onSuccess) onSuccess();
+      }, 2000);
+
+    } catch (err: any) {
+      console.error('Stake error:', err);
+      setError(err.message || 'Failed to place stake. Please try again.');
+    } finally {
+      setIsStaking(false);
+    }
+  };
+
+  const resetAndClose = () => {
+    setError(null);
+    setSuccess(false);
+    setAmount("1.0");
+    setOutcome("YES");
     onClose();
-    
-    // TODO: Actual Solana transaction logic
   };
 
   return (
@@ -61,7 +107,7 @@ export function StakeModal({ isOpen, onClose, market, userReputation = 1.8 }: St
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={resetAndClose}
           />
 
           {/* Modal */}
@@ -77,18 +123,66 @@ export function StakeModal({ isOpen, onClose, market, userReputation = 1.8 }: St
               <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-amber-500/50 rounded-tl-2xl" />
               <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-amber-500/50 rounded-br-2xl" />
 
+              {/* Success State */}
+              {success && (
+                <motion.div
+                  className="absolute inset-0 bg-emerald-500/10 backdrop-blur-sm rounded-2xl flex items-center justify-center z-10"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  <div className="text-center">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 200 }}
+                      className="inline-flex items-center justify-center w-20 h-20 bg-emerald-500 rounded-full mb-4"
+                    >
+                      <Check className="w-12 h-12 text-white" />
+                    </motion.div>
+                    <h3 className="text-2xl font-bold text-white mb-2 font-orbitron">
+                      STAKE PLACED!
+                    </h3>
+                    <p className="text-slate-300">Position recorded successfully</p>
+                  </div>
+                </motion.div>
+              )}
+
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-orbitron font-bold text-amber-400 uppercase tracking-wider">
                   Place Stake
                 </h2>
                 <button
-                  onClick={onClose}
+                  onClick={resetAndClose}
                   className="text-slate-400 hover:text-white transition-colors p-1"
+                  disabled={isStaking}
                 >
                   <X className="w-6 h-6" />
                 </button>
               </div>
+
+              {/* Error Message */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded-lg flex items-center gap-2"
+                >
+                  <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                  <p className="text-sm text-red-300">{error}</p>
+                </motion.div>
+              )}
+
+              {/* Wallet Not Connected Warning */}
+              {!connected && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-4 p-3 bg-amber-500/10 border border-amber-500/50 rounded-lg"
+                >
+                  <p className="text-sm text-amber-300">Connect your wallet to place a stake</p>
+                </motion.div>
+              )}
 
               {/* Market Question */}
               <div className="mb-6 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
@@ -99,6 +193,7 @@ export function StakeModal({ isOpen, onClose, market, userReputation = 1.8 }: St
               <div className="flex gap-2 mb-6">
                 <button
                   onClick={() => setOutcome("YES")}
+                  disabled={isStaking}
                   className={`flex-1 py-3 rounded-lg font-bold transition-all ${
                     outcome === "YES"
                       ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/50 scale-105"
@@ -109,6 +204,7 @@ export function StakeModal({ isOpen, onClose, market, userReputation = 1.8 }: St
                 </button>
                 <button
                   onClick={() => setOutcome("NO")}
+                  disabled={isStaking}
                   className={`flex-1 py-3 rounded-lg font-bold transition-all ${
                     outcome === "NO"
                       ? "bg-red-500 text-white shadow-lg shadow-red-500/50 scale-105"
@@ -128,7 +224,8 @@ export function StakeModal({ isOpen, onClose, market, userReputation = 1.8 }: St
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full bg-slate-800 border-2 border-slate-700 rounded-lg px-4 py-3 text-3xl font-bold text-white focus:outline-none focus:border-amber-500 transition-colors font-mono"
+                  disabled={isStaking}
+                  className="w-full bg-slate-800 border-2 border-slate-700 rounded-lg px-4 py-3 text-3xl font-bold text-white focus:outline-none focus:border-amber-500 transition-colors font-mono disabled:opacity-50"
                   step="0.1"
                   min="0.1"
                   placeholder="0.0"
@@ -140,7 +237,8 @@ export function StakeModal({ isOpen, onClose, market, userReputation = 1.8 }: St
                     <button
                       key={amt}
                       onClick={() => setAmount(amt.toString())}
-                      className="py-2 bg-slate-800 hover:bg-slate-700 rounded text-sm font-bold transition-colors border border-slate-700 hover:border-slate-600"
+                      disabled={isStaking}
+                      className="py-2 bg-slate-800 hover:bg-slate-700 rounded text-sm font-bold transition-colors border border-slate-700 hover:border-slate-600 disabled:opacity-50"
                     >
                       {amt}
                     </button>
@@ -180,29 +278,24 @@ export function StakeModal({ isOpen, onClose, market, userReputation = 1.8 }: St
                     YES {market.oddsYes}% • NO {market.oddsNo}%
                   </span>
                 </div>
-                <div className="flex justify-between items-center p-2 bg-slate-800/30 rounded">
-                  <span className="text-slate-400">Your Reputation:</span>
-                  <span className="text-amber-400 font-bold">
-                    {userReputation.toFixed(1)}x (Veteran)
-                  </span>
-                </div>
               </div>
 
               {/* Actions */}
               <div className="flex gap-3">
                 <button
-                  onClick={onClose}
-                  className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 rounded-lg font-bold transition-colors border border-slate-700"
+                  onClick={resetAndClose}
+                  disabled={isStaking}
+                  className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 rounded-lg font-bold transition-colors border border-slate-700 disabled:opacity-50"
                 >
                   CANCEL
                 </button>
                 <motion.button
                   onClick={handleStake}
-                  disabled={isStaking || parseFloat(amount) <= 0}
+                  disabled={isStaking || !connected || parseFloat(amount) <= 0}
                   className="flex-1 py-3 bg-amber-500 hover:bg-amber-600 rounded-lg font-bold text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
+                  whileHover={{ scale: connected ? 1.02 : 1 }}
+                  whileTap={{ scale: connected ? 0.98 : 1 }}
+                  >
                   {isStaking ? (
                     <span className="flex items-center justify-center gap-2">
                       <motion.div
@@ -210,7 +303,7 @@ export function StakeModal({ isOpen, onClose, market, userReputation = 1.8 }: St
                         animate={{ rotate: 360 }}
                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                       />
-                      CONFIRMING...
+                      STAKING...
                     </span>
                   ) : (
                     "CONFIRM STAKE →"
