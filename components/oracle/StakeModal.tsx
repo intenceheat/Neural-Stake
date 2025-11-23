@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, AlertCircle } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -43,6 +43,21 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
     if (stake === 0) return 0;
     return ((calculatePayout() / stake - 1) * 100);
   };
+
+  // Prevent background scrolling when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      // Save the current overflow value
+      const originalOverflow = document.body.style.overflow;
+      // Disable scrolling
+      document.body.style.overflow = 'hidden';
+      
+      // Cleanup: restore scrolling when modal closes
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isOpen]);
 
   const handleStake = async () => {
     if (!connected || !publicKey) {

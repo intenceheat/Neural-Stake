@@ -133,7 +133,52 @@ export function HomeView() {
       <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-600" />
+            <motion.div
+              className="relative w-8 h-8"
+              animate={{
+                rotate: [0, 360],
+              }}
+              transition={{
+                duration: 20,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            >
+              <svg viewBox="0 0 28 28" className="w-full h-full">
+                <motion.path
+                  d="M14 2.5L24 8.5V19.5L14 25.5L4 19.5V8.5L14 2.5Z"
+                  fill="none"
+                  stroke="url(#glowGradient)"
+                  strokeWidth="2"
+                  animate={{
+                    opacity: [0.6, 1, 0.6],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+                <defs>
+                  <linearGradient id="glowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#f59e0b" />
+                    <stop offset="100%" stopColor="#ea580c" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-orange-600/20 rounded-lg blur-sm"
+                animate={{
+                  scale: [1, 1.3, 1],
+                  opacity: [0.3, 0.6, 0.3],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+            </motion.div>
             <h1 className="text-xl font-orbitron font-black uppercase tracking-wider text-amber-400">
               Oracle Protocol
             </h1>

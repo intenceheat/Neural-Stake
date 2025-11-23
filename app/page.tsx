@@ -1,3 +1,5 @@
+// app/page.tsx (FIX CONTENT OFFSET)
+
 "use client";
 
 import { AnimatePresence } from "framer-motion";
@@ -24,8 +26,8 @@ export default function Page() {
         <NavigationDrawer />
       </div>
 
-      {/* Main Content - offset for sidebar on desktop */}
-      <main className="md:ml-[240px] pb-20 md:pb-0">
+      {/* Main Content - proper offset */}
+      <main className="md:ml-[100px] pb-24 md:pb-0">
         <AnimatePresence mode="wait">
           {activeView === "home" && <HomeView key="home" />}
           {activeView === "positions" && <PositionsView key="positions" />}
