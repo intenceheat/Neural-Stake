@@ -1,18 +1,20 @@
-// components/views/MarketsView.tsx - FULL FILE
+// components/views/MarketsView.tsx - COMPLETE REBUILD
 
 "use client"
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { Search, Filter, TrendingUp } from "lucide-react"
+import { Search, TrendingUp } from "lucide-react"
 import { marketService, type Market } from "@/lib/supabase"
 import { MarketCard } from "@/components/oracle/MarketCard"
+import { StakeModal } from "@/components/oracle/StakeModal"
 
 export function MarketsView() {
   const [markets, setMarkets] = useState<Market[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
-  const [filterCategory, setFilterCategory] = useState<string>("all")
+  const [selectedMarket, setSelectedMarket] = useState<Market | null>(null)
+  const [isStakeModalOpen, setIsStakeModalOpen] = useState(false)
 
   useEffect(() => {
     fetchMarkets()
@@ -28,6 +30,15 @@ export function MarketsView() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleMarketClick = (market: Market) => {
+    setSelectedMarket(market)
+    setIsStakeModalOpen(true)
+  }
+
+  const handleStakeSuccess = () => {
+    fetchMarkets() // Refresh markets after successful stake
   }
 
   const calculateOdds = (market: Market) => {
@@ -139,15 +150,28 @@ export function MarketsView() {
                   volume={market.total_volume}
                   participants={market.participant_count}
                   timeRemaining={getTimeRemaining(market.end_time)}
-                  onClick={() => {
-                    console.log("Market clicked:", market.market_id)
-                  }}
+                  onClick={() => handleMarketClick(market)}
                 />
               )
             })}
           </div>
         )}
       </div>
+
+      {/* Stake Modal */}
+      {selectedMarket && (
+        <StakeModal
+          isOpen={isStakeModalOpen}
+          onClose={() => setIsStakeModalOpen(false)}
+          market={{
+            id: selectedMarket.market_id,
+            question: selectedMarket.question,
+            oddsYes: calculateOdds(selectedMarket).oddsYes,
+            oddsNo: calculateOdds(selectedMarket).oddsNo,
+          }}
+          onSuccess={handleStakeSuccess}
+        />
+      )}
     </div>
   )
 }
