@@ -3,7 +3,7 @@
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::native_token::LAMPORTS_PER_SOL;
 
-declare_id!("8oqBxzSyvTJBQzREHyAG6oYfa9FvJxQLaK6gkPeyum9k");
+declare_id!("49ZgXvL4bGZfiTNojjGAigh5FpxccpJ6K9z3VL2LtvYe");
 
 #[program]
 pub mod oracle_program {
