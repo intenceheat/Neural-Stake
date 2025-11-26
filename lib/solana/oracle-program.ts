@@ -77,11 +77,9 @@ export async function createMarket(
   const escrowPDA = getMarketEscrowPDA(marketPDA);
 
   // Calculate discriminator for create_market
-  const discriminatorCalc = await crypto.subtle.digest(
-    'SHA-256', 
-    new TextEncoder().encode("global:create_market")
-  );
-  const discriminator = new Uint8Array(discriminatorCalc).slice(0, 8);
+  // Calculate discriminator for create_market using Node.js Buffer to avoid browser/TextEncoder/crypto compatibility issues
+  const discriminatorHash = require('crypto').createHash('sha256').update("global:create_market").digest();
+  const discriminator = discriminatorHash.subarray(0, 8);
 
   // Build instruction data
   const marketIdBuffer = Buffer.from(marketId);
@@ -148,21 +146,31 @@ export async function placeStake(
 
   const lamports = amount * LAMPORTS_PER_SOL;
 
-  // Build instruction data
+  // Build instruction data: discriminator + amount + outcome + timestamp
   const discriminator = Buffer.from([22, 66, 171, 110, 117, 28, 158, 57]);
+  
   const amountBuffer: ArrayBufferLike = new ArrayBuffer(8);
   const amountView = new DataView(amountBuffer);
   amountView.setBigUint64(0, BigInt(lamports), true);
   const amountBytes = new Uint8Array(amountBuffer);
+  
   const outcomeBytes = Uint8Array.from([outcome]);
+  
+  // ADD TIMESTAMP
+  const timestampBuffer: ArrayBufferLike = new ArrayBuffer(8);
+  const timestampView = new DataView(timestampBuffer);
+  timestampView.setBigInt64(0, BigInt(timestamp), true);
+  const timestampBytes = new Uint8Array(timestampBuffer);
 
   const dataBuffer: ArrayBufferLike = new ArrayBuffer(
-    discriminator.length + amountBytes.length + outcomeBytes.length
+    discriminator.length + amountBytes.length + outcomeBytes.length + timestampBytes.length
   );
   const data = new Uint8Array(dataBuffer);
   data.set(discriminator, 0);
   data.set(amountBytes, discriminator.length);
   data.set(outcomeBytes, discriminator.length + amountBytes.length);
+  data.set(timestampBytes, discriminator.length + amountBytes.length + outcomeBytes.length);
+
   const instruction = new TransactionInstruction({
     keys: [
       { pubkey: marketPDA, isSigner: false, isWritable: true },

@@ -37,12 +37,13 @@ pub mod oracle_program {
         ctx: Context<PlaceStake>,
         amount: u64,
         outcome: Outcome,
+        timestamp: i64,
     ) -> Result<()> {
         let market = &mut ctx.accounts.market;
         let position = &mut ctx.accounts.position;
         let clock = Clock::get()?;
 
-        // Validate market is active
+    // Validate market is active
         require!(market.status == MarketStatus::Active, ErrorCode::MarketNotActive);
         require!(clock.unix_timestamp < market.end_time, ErrorCode::MarketExpired);
         require!(amount > 0, ErrorCode::InvalidAmount);
@@ -215,6 +216,7 @@ pub struct CreateMarket<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(amount: u64, outcome: Outcome, timestamp: i64)]
 pub struct PlaceStake<'info> {
     #[account(mut)]
     pub market: Account<'info, Market>,
@@ -235,7 +237,7 @@ pub struct PlaceStake<'info> {
             b"position",
             user.key().as_ref(),
             market.key().as_ref(),
-            &Clock::get()?.unix_timestamp.to_le_bytes()
+            &timestamp.to_le_bytes()
         ],
         bump
     )]
