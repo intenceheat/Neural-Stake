@@ -188,3 +188,69 @@ export async function placeStake(
   
   return { signature, positionPDA };
 }
+
+// Resolve Market instruction (authority only)
+export async function resolveMarket(
+  provider: AnchorProvider,
+  marketId: string,
+  winningOutcome: Outcome
+) {
+  const marketPDA = getMarketPDA(marketId);
+
+  // Discriminator for resolve_market
+  const discriminatorHash = require('crypto').createHash('sha256').update("global:resolve_market").digest();
+  const discriminator = discriminatorHash.subarray(0, 8);
+
+  const outcomeBytes = Uint8Array.from([winningOutcome]);
+
+  const dataBuffer: ArrayBufferLike = new ArrayBuffer(discriminator.length + 1);
+  const data = new Uint8Array(dataBuffer);
+  data.set(discriminator, 0);
+  data.set(outcomeBytes, discriminator.length);
+
+  const instruction = new TransactionInstruction({
+    keys: [
+      { pubkey: marketPDA, isSigner: false, isWritable: true },
+      { pubkey: provider.wallet.publicKey, isSigner: true, isWritable: false },
+    ],
+    programId: ORACLE_PROGRAM_ID,
+    data: data as any,
+  });
+
+  const tx = new Transaction().add(instruction);
+  const signature = await provider.sendAndConfirm(tx);
+
+  return { signature, marketPDA };
+}
+
+// Claim Payout instruction
+export async function claimPayout(
+  provider: AnchorProvider,
+  marketId: string,
+  positionTimestamp: number
+) {
+  const marketPDA = getMarketPDA(marketId);
+  const escrowPDA = getMarketEscrowPDA(marketPDA);
+  const positionPDA = getPositionPDA(provider.wallet.publicKey, marketPDA, positionTimestamp);
+
+  // Discriminator for claim_payout
+  const discriminatorHash = require('crypto').createHash('sha256').update("global:claim_payout").digest();
+  const discriminator = discriminatorHash.subarray(0, 8);
+
+  const instruction = new TransactionInstruction({
+    keys: [
+      { pubkey: marketPDA, isSigner: false, isWritable: true },
+      { pubkey: escrowPDA, isSigner: false, isWritable: true },
+      { pubkey: positionPDA, isSigner: false, isWritable: true },
+      { pubkey: provider.wallet.publicKey, isSigner: true, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    programId: ORACLE_PROGRAM_ID,
+    data: discriminator as any,
+  });
+
+  const tx = new Transaction().add(instruction);
+  const signature = await provider.sendAndConfirm(tx);
+
+  return { signature, positionPDA };
+}

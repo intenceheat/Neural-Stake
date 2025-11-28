@@ -1,22 +1,26 @@
-// components/views/PositionsView.tsx - ADD WRAPPER
+// components/views/PositionsView.tsx - UPDATED WITH CLAIM FLOW
 
 "use client";
 
 import { useState, useEffect } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, Wallet } from "lucide-react";
+import { TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, Wallet, Send } from "lucide-react";
 import { positionService, marketService, type Position, type Market } from "@/lib/supabase";
+import { claimPayout, getProvider, Outcome } from "@/lib/solana/oracle-program";
+import { toast } from "sonner";
 
 interface PositionWithMarket extends Position {
   market?: Market;
 }
 
 export function PositionsView() {
-  const { publicKey, connected } = useWallet();
+  const { publicKey, connected, signTransaction, sendTransaction } = useWallet();
+  const { connection } = useConnection();
   const [positions, setPositions] = useState<PositionWithMarket[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"active" | "resolved">("active");
+  const [claimingId, setClaimingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (connected && publicKey) {
@@ -50,6 +54,59 @@ export function PositionsView() {
       console.error("Error fetching positions:", error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleClaim(pos: PositionWithMarket) {
+    if (!publicKey || !pos.market || !signTransaction) {
+      toast.error("Wallet not connected");
+      return;
+    }
+
+    // Check if market is resolved
+    if (pos.market.status !== "resolved") {
+      toast.error("Market not resolved yet");
+      return;
+    }
+
+    // Check if already claimed
+    if (pos.claimed) {
+      toast.info("Position already claimed");
+      return;
+    }
+
+    // Check if winner
+    if (pos.market.winning_outcome !== pos.outcome) {
+      toast.error("Losing position, no payout");
+      return;
+    }
+
+    try {
+      setClaimingId(pos.id);
+      
+      // Extract timestamp from position creation
+      const positionCreatedAt = new Date(pos.created_at).getTime();
+      const positionTimestamp = Math.floor(positionCreatedAt / 1000);
+
+      // Call on-chain claim instruction
+      const { signature } = await claimPayout(
+        getProvider({ publicKey } as any, connection),
+        pos.market_id,
+        positionTimestamp
+      );
+
+      // Update local DB with claim status
+      await positionService.claim(pos.id, pos.potential_payout);
+
+      toast.success(`Claim submitted: ${signature.slice(0, 8)}...`);
+      
+      // Refresh positions
+      await fetchPositions();
+    } catch (error: any) {
+      console.error("Claim failed:", error);
+      toast.error(error.message || "Claim failed");
+    } finally {
+      setClaimingId(null);
     }
   }
 
@@ -192,6 +249,7 @@ export function PositionsView() {
               const currentValue = calculateCurrentValue(pos);
               const unrealizedPL = currentValue - pos.stake_amount;
               const isWinner = pos.market?.winning_outcome === pos.outcome;
+              const canClaim = pos.market?.status === "resolved" && isWinner && !pos.claimed;
 
               return (
                 <motion.div
@@ -226,17 +284,51 @@ export function PositionsView() {
                     </div>
 
                     {activeTab === "resolved" && (
-                      <div className="flex items-center gap-2">
-                        {pos.payout_amount > 0 ? (
-                          <>
-                            <CheckCircle className="w-6 h-6 text-emerald-400" />
-                            <span className="text-emerald-400 font-bold">WON</span>
-                          </>
-                        ) : (
-                          <>
-                            <XCircle className="w-6 h-6 text-red-400" />
-                            <span className="text-red-400 font-bold">LOST</span>
-                          </>
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
+                          {pos.payout_amount > 0 ? (
+                            <>
+                              <CheckCircle className="w-6 h-6 text-emerald-400" />
+                              <span className="text-emerald-400 font-bold">WON</span>
+                            </>
+                          ) : (
+                            <>
+                              <XCircle className="w-6 h-6 text-red-400" />
+                              <span className="text-red-400 font-bold">LOST</span>
+                            </>
+                          )}
+                        </div>
+
+                        {canClaim && (
+                          <button
+                            onClick={() => handleClaim(pos)}
+                            disabled={claimingId === pos.id}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold transition-all ${
+                              claimingId === pos.id
+                                ? "bg-slate-700 text-slate-400 cursor-not-allowed"
+                                : "bg-emerald-500 text-white hover:bg-emerald-600"
+                            }`}
+                          >
+                            {claimingId === pos.id ? (
+                              <>
+                                <motion.div
+                                  className="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full"
+                                  animate={{ rotate: 360 }}
+                                  transition={{ duration: 0.8, repeat: Infinity }}
+                                />
+                                Claiming...
+                              </>
+                            ) : (
+                              <>
+                                <Send className="w-4 h-4" />
+                                Claim
+                              </>
+                            )}
+                          </button>
+                        )}
+
+                        {pos.claimed && (
+                          <div className="text-emerald-400 text-sm font-bold">✓ CLAIMED</div>
                         )}
                       </div>
                     )}
