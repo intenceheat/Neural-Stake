@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { SentimentOrb } from "./SentimentOrb";
-import { Clock, TrendingUp, Users } from "lucide-react";
+import { Clock, TrendingUp, Users, CheckCircle } from "lucide-react";
 
 interface MarketCardProps {
   marketId: string;
@@ -15,6 +15,8 @@ interface MarketCardProps {
   participants: number;
   timeRemaining: string;
   onClick?: () => void;
+  isResolved?: boolean; // NEW PROP
+  winningOutcome?: "YES" | "NO" | null; // NEW PROP
 }
 
 export function MarketCard({
@@ -28,20 +30,36 @@ export function MarketCard({
   participants,
   timeRemaining,
   onClick,
+  isResolved = false, // DEFAULT FALSE
+  winningOutcome = null, // DEFAULT NULL
 }: MarketCardProps) {
   return (
     <motion.div
-      className="group relative bg-slate-900 border border-slate-800 rounded-xl p-6 cursor-pointer overflow-hidden"
-      whileHover={{
+      className={`group relative bg-slate-900 border border-slate-800 rounded-xl p-6 overflow-hidden ${
+        isResolved ? "cursor-default opacity-90" : "cursor-pointer"
+      }`}
+      whileHover={!isResolved ? {
         scale: 1.02,
         boxShadow: "0 0 20px rgba(245, 158, 11, 0.3)",
-      }}
-      whileTap={{ scale: 0.98 }}
-      onClick={onClick}
+      } : {}}
+      whileTap={!isResolved ? { scale: 0.98 } : {}}
+      onClick={isResolved ? undefined : onClick} // DISABLE CLICK IF RESOLVED
       transition={{ duration: 0.2 }}
     >
-      {/* Hover glow effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 to-amber-500/0 group-hover:from-amber-500/5 group-hover:to-transparent transition-all duration-300" />
+      {/* Resolved Badge */}
+      {isResolved && winningOutcome && (
+        <div className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-slate-800 rounded-full border border-slate-700">
+          <CheckCircle className="w-4 h-4 text-emerald-400" />
+          <span className="text-xs font-bold text-emerald-400">
+            RESOLVED: {winningOutcome}
+          </span>
+        </div>
+      )}
+
+      {/* Hover glow effect (disabled if resolved) */}
+      {!isResolved && (
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 to-amber-500/0 group-hover:from-amber-500/5 group-hover:to-transparent transition-all duration-300" />
+      )}
 
       <div className="relative flex items-start gap-4">
         {/* Sentiment Orb */}
@@ -58,15 +76,33 @@ export function MarketCard({
         {/* Content */}
         <div className="flex-1 min-w-0">
           {/* Question */}
-          <h3 className="text-lg font-bold text-white mb-3 line-clamp-2 group-hover:text-amber-400 transition-colors">
+          <h3 className={`text-lg font-bold text-white mb-3 line-clamp-2 transition-colors ${
+            !isResolved && "group-hover:text-amber-400"
+          }`}>
             {question}
           </h3>
 
           {/* Odds Bar */}
           <div className="mb-4">
             <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-emerald-400 font-bold">YES {oddsYes}%</span>
-              <span className="text-red-400 font-bold">NO {oddsNo}%</span>
+              <span className={`font-bold ${
+                isResolved && winningOutcome === "YES" 
+                  ? "text-emerald-400" 
+                  : isResolved && winningOutcome === "NO"
+                  ? "text-emerald-400/30"
+                  : "text-emerald-400"
+              }`}>
+                YES {oddsYes}%
+              </span>
+              <span className={`font-bold ${
+                isResolved && winningOutcome === "NO" 
+                  ? "text-red-400" 
+                  : isResolved && winningOutcome === "YES"
+                  ? "text-red-400/30"
+                  : "text-red-400"
+              }`}>
+                NO {oddsNo}%
+              </span>
             </div>
             <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
               <motion.div
@@ -112,8 +148,16 @@ export function MarketCard({
       </div>
 
       {/* Corner accents */}
-      <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-amber-500/20 rounded-tl-xl group-hover:border-amber-500/50 transition-colors" />
-      <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-amber-500/20 rounded-br-xl group-hover:border-amber-500/50 transition-colors" />
+      <div className={`absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 rounded-tl-xl transition-colors ${
+        isResolved 
+          ? "border-slate-700" 
+          : "border-amber-500/20 group-hover:border-amber-500/50"
+      }`} />
+      <div className={`absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 rounded-br-xl transition-colors ${
+        isResolved 
+          ? "border-slate-700" 
+          : "border-amber-500/20 group-hover:border-amber-500/50"
+      }`} />
     </motion.div>
   );
 }

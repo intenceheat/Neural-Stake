@@ -1,15 +1,21 @@
 "use client";
 
-import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export function WalletButton() {
-  const { publicKey, disconnect } = useWallet();
+  const [mounted, setMounted] = useState(false);
 
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 4)}...${address.slice(-4)}`;
-  };
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="w-[140px] h-[40px] bg-slate-800 rounded-lg animate-pulse" />
+    );
+  }
 
   return (
     <motion.div
@@ -22,9 +28,7 @@ export function WalletButton() {
         style={{
           fontFamily: "var(--font-orbitron)",
         }}
-      >
-        {publicKey ? formatAddress(publicKey.toBase58()) : "Connect Wallet"}
-      </WalletMultiButton>
+      />
     </motion.div>
   );
 }

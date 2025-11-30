@@ -70,83 +70,146 @@ export function MarketsView() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="min-h-[70vh] flex items-center justify-center">
           <motion.div
-            className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          />
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="relative w-20 h-20"
+          >
+            <div className="absolute inset-0 border-4 border-amber-500/20 rounded-full" />
+            <div className="absolute inset-0 border-4 border-transparent border-t-amber-500 rounded-full" />
+          </motion.div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <div className="space-y-8">
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="space-y-10">
         {/* Header */}
-        <div>
-          <h1 className="text-4xl font-orbitron font-black text-white mb-2">
-            MARKETS
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="relative"
+        >
+          <div className="absolute -top-4 -left-4 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl" />
+          <h1 className="text-5xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 mb-3 tracking-tight">
+            PREDICTION MARKETS
           </h1>
-          <p className="text-slate-400">
-            Browse and participate in prediction markets
+          <p className="text-slate-400 text-lg font-light">
+            Stake on outcomes. Shape the future. Earn rewards.
           </p>
-        </div>
+        </motion.div>
 
         {/* Tabs */}
-        <div className="flex gap-2 border-b border-slate-800">
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+          className="flex gap-3 p-1.5 bg-slate-900/50 backdrop-blur-sm rounded-xl border border-slate-800/50 w-fit"
+        >
           <button
             onClick={() => setActiveTab("active")}
-            className={`px-6 py-3 font-orbitron font-bold transition-colors ${
+            className={`relative px-8 py-3.5 font-orbitron font-bold rounded-lg transition-all duration-300 ${
               activeTab === "active"
-                ? "text-amber-400 border-b-2 border-amber-400"
-                : "text-slate-400 hover:text-slate-300"
+                ? "text-slate-900 bg-gradient-to-r from-amber-400 to-amber-500 shadow-lg shadow-amber-500/25"
+                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
             }`}
           >
-            Active ({markets.filter((m) => m.status === "active").length})
+            <span className="relative z-10">Active</span>
+            {activeTab === "active" && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-500 rounded-lg"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className={`relative z-10 ml-2 text-sm ${activeTab === "active" ? "text-slate-900" : "text-slate-500"}`}>
+              {markets.filter((m) => m.status === "active").length}
+            </span>
           </button>
           <button
             onClick={() => setActiveTab("resolved")}
-            className={`px-6 py-3 font-orbitron font-bold transition-colors ${
+            className={`relative px-8 py-3.5 font-orbitron font-bold rounded-lg transition-all duration-300 ${
               activeTab === "resolved"
-                ? "text-amber-400 border-b-2 border-amber-400"
-                : "text-slate-400 hover:text-slate-300"
+                ? "text-slate-900 bg-gradient-to-r from-amber-400 to-amber-500 shadow-lg shadow-amber-500/25"
+                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
             }`}
           >
-            Resolved ({markets.filter((m) => m.status === "resolved").length})
+            <span className="relative z-10">Resolved</span>
+            {activeTab === "resolved" && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-500 rounded-lg"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className={`relative z-10 ml-2 text-sm ${activeTab === "resolved" ? "text-slate-900" : "text-slate-500"}`}>
+              {markets.filter((m) => m.status === "resolved").length}
+            </span>
           </button>
-        </div>
+        </motion.div>
 
         {/* Markets Grid */}
         {markets.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-slate-400 text-lg">
-              No {activeTab === "active" ? "active" : "resolved"} markets found.
-            </p>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="text-center py-24 px-6"
+          >
+            <div className="max-w-md mx-auto">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-slate-800/50 flex items-center justify-center border border-slate-700/50">
+                <svg className="w-10 h-10 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+              </div>
+              <p className="text-slate-400 text-xl font-light mb-2">
+                No {activeTab === "active" ? "active" : "resolved"} markets available
+              </p>
+              <p className="text-slate-500 text-sm">
+                Check back soon for new prediction opportunities
+              </p>
+            </div>
+          </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {markets.map((market) => {
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {markets.map((market, index) => {
               const odds = calculateOdds(market);
               return (
-                <MarketCard
+                <motion.div
                   key={market.id}
-                  marketId={market.market_id}
-                  question={market.question}
-                  oddsYes={odds.oddsYes}
-                  oddsNo={odds.oddsNo}
-                  sentiment={market.sentiment_score}
-                  confidence={market.sentiment_confidence}
-                  volume={market.total_volume}
-                  participants={market.participant_count}
-                  timeRemaining={getTimeRemaining(market.end_time)}
-                  onClick={() => handleMarketClick(market)}
-                />
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05, duration: 0.5, ease: "easeOut" }}
+                >
+                  <MarketCard
+                    marketId={market.market_id}
+                    question={market.question}
+                    oddsYes={odds.oddsYes}
+                    oddsNo={odds.oddsNo}
+                    sentiment={market.sentiment_score}
+                    confidence={market.sentiment_confidence}
+                    volume={market.total_volume}
+                    participants={market.participant_count}
+                    timeRemaining={getTimeRemaining(market.end_time)}
+                    onClick={() => handleMarketClick(market)}
+                    isResolved={market.status === "resolved"}  // ADD THIS LINE
+                    winningOutcome={market.winning_outcome as "YES" | "NO" | null} 
+                  />
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         )}
       </div>
 
@@ -166,4 +229,4 @@ export function MarketsView() {
       )}
     </div>
   );
-}
+} 

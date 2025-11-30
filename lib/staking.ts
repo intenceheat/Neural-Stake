@@ -70,6 +70,8 @@ export const stakingService = {
       const currentOddsForDisplay = (1 / oddsDecimal) * 100;
   
       // 4. Create position
+      // Use a consistent on-chain timestamp for PDA derivation & later claims
+      const onchainTimestamp = Math.floor(Date.now() / 1000);
       const position = await positionService.create({
         user_wallet: userWallet,
         market_id: marketId,
@@ -80,6 +82,7 @@ export const stakingService = {
         claimed: false,
         payout_amount: 0,
         transaction_signature: null,
+        onchain_timestamp: onchainTimestamp,
       });
 
       // 5. Update market pools

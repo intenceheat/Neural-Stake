@@ -4,6 +4,8 @@
 
 import { useState, useEffect } from "react";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
+import type { AnchorWallet } from "@solana/wallet-adapter-react";
+import type { Transaction } from "@solana/web3.js";
 import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, Wallet, Send } from "lucide-react";
 import { positionService, marketService, type Position, type Market } from "@/lib/supabase";
@@ -58,52 +60,56 @@ export function PositionsView() {
   }
 
   async function handleClaim(pos: PositionWithMarket) {
+    console.log("=== CLAIM STARTED ===", pos);
+    
     if (!publicKey || !pos.market || !signTransaction) {
       toast.error("Wallet not connected");
       return;
     }
-
-    // Check if market is resolved
+  
     if (pos.market.status !== "resolved") {
       toast.error("Market not resolved yet");
       return;
     }
-
-    // Check if already claimed
+  
     if (pos.claimed) {
       toast.info("Position already claimed");
       return;
     }
-
-    // Check if winner
-    if (pos.market.winning_outcome !== pos.outcome) {
+  
+    if (pos.market.winning_outcome?.toUpperCase() !== pos.outcome?.toUpperCase()) {
       toast.error("Losing position, no payout");
       return;
     }
-
+  
     try {
       setClaimingId(pos.id);
       
-      // Extract timestamp from position creation
-      const positionCreatedAt = new Date(pos.created_at).getTime();
-      const positionTimestamp = Math.floor(positionCreatedAt / 1000);
-
-      // Call on-chain claim instruction
+      const positionTimestamp = pos.onchain_timestamp;
+      
+      console.log("📍 Calling claimPayout:", pos.market_id, positionTimestamp);
+  
+      const wallet = {
+        publicKey,
+        signTransaction,
+        signAllTransactions: async (txs: Transaction[]) => {
+          return await Promise.all(txs.map(tx => signTransaction(tx)));
+        }
+      };
+      
       const { signature } = await claimPayout(
-        getProvider({ publicKey } as any, connection),
+        getProvider(wallet as AnchorWallet, connection),
         pos.market_id,
         positionTimestamp
       );
-
-      // Update local DB with claim status
-      await positionService.claim(pos.id, pos.potential_payout);
-
-      toast.success(`Claim submitted: ${signature.slice(0, 8)}...`);
+  
+      console.log("✅ Signature:", signature);
       
-      // Refresh positions
+      await positionService.claim(pos.id, pos.potential_payout);
+      toast.success(`Claim submitted: ${signature.slice(0, 8)}...`);
       await fetchPositions();
     } catch (error: any) {
-      console.error("Claim failed:", error);
+      console.error("❌ ERROR:", error);
       toast.error(error.message || "Claim failed");
     } finally {
       setClaimingId(null);
@@ -111,7 +117,14 @@ export function PositionsView() {
   }
 
   const activePositions = positions.filter((p) => p.market?.status === "active");
-  const resolvedPositions = positions.filter((p) => p.market?.status === "resolved");
+  const resolvedPositions = positions
+    .filter((p) => p.market?.status === "resolved")
+    .sort((a, b) => {
+      // Sort by resolved_at descending (most recent first)
+      const aResolved = a.market?.resolved_at ? new Date(a.market.resolved_at).getTime() : 0;
+      const bResolved = b.market?.resolved_at ? new Date(b.market.resolved_at).getTime() : 0;
+      return bResolved - aResolved;
+    });
 
   const totalStaked = positions.reduce((sum, p) => sum + p.stake_amount, 0);
   const totalProfit = resolvedPositions.reduce((sum, p) => sum + (p.payout_amount - p.stake_amount), 0);
@@ -248,7 +261,7 @@ export function PositionsView() {
             {displayedPositions.map((pos) => {
               const currentValue = calculateCurrentValue(pos);
               const unrealizedPL = currentValue - pos.stake_amount;
-              const isWinner = pos.market?.winning_outcome === pos.outcome;
+              const isWinner = pos.market?.winning_outcome?.toUpperCase() === pos.outcome?.toUpperCase();
               const canClaim = pos.market?.status === "resolved" && isWinner && !pos.claimed;
 
               return (
@@ -286,7 +299,7 @@ export function PositionsView() {
                     {activeTab === "resolved" && (
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2">
-                          {pos.payout_amount > 0 ? (
+                        {isWinner ? (
                             <>
                               <CheckCircle className="w-6 h-6 text-emerald-400" />
                               <span className="text-emerald-400 font-bold">WON</span>

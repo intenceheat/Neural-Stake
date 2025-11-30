@@ -3,7 +3,7 @@
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::native_token::LAMPORTS_PER_SOL;
 
-declare_id!("49ZgXvL4bGZfiTNojjGAigh5FpxccpJ6K9z3VL2LtvYe");
+declare_id!("BhCVTNcTnrzRxZSayuX3kYBJZ36mUk5VB7C7k6uuhpDj");
 
 #[program]
 pub mod oracle_program {
@@ -43,7 +43,7 @@ pub mod oracle_program {
         let position = &mut ctx.accounts.position;
         let clock = Clock::get()?;
 
-    // Validate market is active
+        // Validate market is active
         require!(market.status == MarketStatus::Active, ErrorCode::MarketNotActive);
         require!(clock.unix_timestamp < market.end_time, ErrorCode::MarketExpired);
         require!(amount > 0, ErrorCode::InvalidAmount);
@@ -165,17 +165,31 @@ pub mod oracle_program {
         };
 
         if payout > 0 {
-            // Transfer SOL from escrow to user
+            // ✅ FIX: use system transfer + PDA signer instead of mutating lamports directly
             let market_key = market.key();
-            let seeds = &[
+
+            // PDA signer seeds for market_escrow
+            let seeds: &[&[u8]] = &[
                 b"market_escrow",
                 market_key.as_ref(),
-                &[market.bump],
+                &[ctx.bumps.market_escrow],
             ];
-            let signer = &[&seeds[..]];
 
-            **ctx.accounts.market_escrow.to_account_info().try_borrow_mut_lamports()? -= payout;
-            **ctx.accounts.user.to_account_info().try_borrow_mut_lamports()? += payout;
+            let ix = anchor_lang::solana_program::system_instruction::transfer(
+                &ctx.accounts.market_escrow.key(),
+                &ctx.accounts.user.key(),
+                payout,
+            );
+
+            anchor_lang::solana_program::program::invoke_signed(
+                &ix,
+                &[
+                    ctx.accounts.market_escrow.to_account_info(),
+                    ctx.accounts.user.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                ],
+                &[seeds],
+            )?;
         }
 
         position.payout_amount = payout;
@@ -257,13 +271,14 @@ pub struct ResolveMarket<'info> {
 
 #[derive(Accounts)]
 pub struct ClaimPayout<'info> {
+    #[account(mut)]
     pub market: Account<'info, Market>,
     
     /// CHECK: Market escrow PDA
     #[account(
         mut,
         seeds = [b"market_escrow", market.key().as_ref()],
-        bump = market.bump
+        bump
     )]
     pub market_escrow: AccountInfo<'info>,
     
@@ -272,6 +287,9 @@ pub struct ClaimPayout<'info> {
     
     #[account(mut)]
     pub user: Signer<'info>,
+
+    // ✅ needed for system_instruction::transfer
+    pub system_program: Program<'info, System>,
 }
 
 // Data structures

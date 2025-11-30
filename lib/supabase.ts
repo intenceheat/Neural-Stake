@@ -44,6 +44,8 @@ export interface Position {
   claimed: boolean;
   payout_amount: number;
   transaction_signature: string | null;
+  // Timestamp used on-chain to derive the position PDA
+  onchain_timestamp: number;
   created_at: string;
   claimed_at: string | null;
 }

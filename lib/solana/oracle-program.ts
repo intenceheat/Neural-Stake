@@ -4,7 +4,7 @@ import { PublicKey, SystemProgram, LAMPORTS_PER_SOL, TransactionInstruction, Tra
 import { AnchorWallet } from "@solana/wallet-adapter-react";
 
 // Program ID from deployment
-export const ORACLE_PROGRAM_ID = new PublicKey("49ZgXvL4bGZfiTNojjGAigh5FpxccpJ6K9z3VL2LtvYe");
+export const ORACLE_PROGRAM_ID = new PublicKey("BhCVTNcTnrzRxZSayuX3kYBJZ36mUk5VB7C7k6uuhpDj");
 
 // Outcome enum
 export enum Outcome {
@@ -41,6 +41,30 @@ export function getMarketEscrowPDA(marketPubkey: PublicKey) {
     [Buffer.from("market_escrow"), marketPubkey.toBuffer()],
     ORACLE_PROGRAM_ID
   );
+  return escrowPDA;
+}
+
+// Get Market Escrow PDA with verification
+export async function getMarketEscrowPDAWithVerification(
+  connection: anchor.web3.Connection,
+  marketPubkey: PublicKey
+): Promise<PublicKey> {
+  // Derive escrow PDA using standard method
+  const [escrowPDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from("market_escrow"), marketPubkey.toBuffer()],
+    ORACLE_PROGRAM_ID
+  );
+  
+  // Verify it exists on-chain
+  const accountInfo = await connection.getAccountInfo(escrowPDA);
+  if (!accountInfo) {
+    throw new Error(
+      `Market escrow PDA not found: ${escrowPDA.toBase58()}. ` +
+      `Market PDA: ${marketPubkey.toBase58()}. ` +
+      `This might indicate the market was created with a different market_id.`
+    );
+  }
+  
   return escrowPDA;
 }
 
@@ -186,7 +210,7 @@ export async function placeStake(
   const tx = new Transaction().add(instruction);
   const signature = await provider.sendAndConfirm(tx);
   
-  return { signature, positionPDA };
+  return { signature, positionPDA, timestamp };
 }
 
 // Resolve Market instruction (authority only)
@@ -229,24 +253,126 @@ export async function claimPayout(
   marketId: string,
   positionTimestamp: number
 ) {
-  const marketPDA = getMarketPDA(marketId);
-  const escrowPDA = getMarketEscrowPDA(marketPDA);
+  // Trim marketId to ensure no whitespace issues
+  const cleanMarketId = marketId.trim();
+  const marketPDA = getMarketPDA(cleanMarketId);
+  
+  console.log("🔍 Claim Payout Debug:", {
+    marketId,
+    marketPDA: marketPDA.toBase58(),
+    positionTimestamp,
+  });
+  
+  // Fetch the market account to ensure we have the correct PDA
+  const marketAccountInfo = await provider.connection.getAccountInfo(marketPDA);
+  if (!marketAccountInfo) {
+    throw new Error(`Market account not found: ${marketPDA.toBase58()}. Market ID: ${marketId}`);
+  }
+  
+  // Verify the market account is owned by our program
+  if (!marketAccountInfo.owner.equals(ORACLE_PROGRAM_ID)) {
+    throw new Error(`Market account is not owned by the oracle program. Owner: ${marketAccountInfo.owner.toBase58()}`);
+  }
+  
+  // The market account's key IS the marketPDA, so we use that directly
+  // Derive escrow PDA - verify it exists on-chain
+  // The Rust program uses market.key().as_ref() which is the market's PublicKey bytes
+  // We need to use the marketPDA (which is market.key()) to derive the escrow
+  const escrowPDA = await getMarketEscrowPDAWithVerification(provider.connection, marketPDA);
+  
+  // Additional verification: try to find if there's an escrow account with the "wrong" address
+  const wrongEscrowPDA = new PublicKey("FABXiVKzTeu4mfdCdSXfSGamdJ9iUuzdjR9svPcSrJ77");
+  const wrongEscrowInfo = await provider.connection.getAccountInfo(wrongEscrowPDA);
+  if (wrongEscrowInfo) {
+    console.warn("⚠️ WARNING: Found an escrow account at the 'wrong' address:", wrongEscrowPDA.toBase58());
+    console.warn("   This might indicate the market was created with a different market_id or derivation method.");
+  }
   const positionPDA = getPositionPDA(provider.wallet.publicKey, marketPDA, positionTimestamp);
 
-  // Discriminator for claim_payout
+  console.log("🔍 PDAs:", {
+    marketPDA: marketPDA.toBase58(),
+    escrowPDA: escrowPDA.toBase58(),
+    positionPDA: positionPDA.toBase58(),
+  });
+
+  // Verify position account exists
+  const positionAccountInfo = await provider.connection.getAccountInfo(positionPDA);
+  if (!positionAccountInfo) {
+    throw new Error(`Position account not found: ${positionPDA.toBase58()}`);
+  }
+  
+  // CRITICAL: Read the market PDA from the position account data
+  // The position account stores position.market (Pubkey) at offset 32 (after discriminator + user Pubkey)
+  // Position structure: discriminator(8) + user(32) + market(32) + ...
+  const positionData = positionAccountInfo.data;
+  if (positionData.length < 72) {
+    throw new Error(`Position account data too short: ${positionData.length} bytes`);
+  }
+  
+  // Extract market Pubkey from position account (offset 40: 8 discriminator + 32 user)
+  const marketPubkeyFromPosition = new PublicKey(positionData.slice(40, 72));
+  
+  console.log("🔍 Market PDA from Position Account:", {
+    derivedFromMarketId: marketPDA.toBase58(),
+    fromPositionAccount: marketPubkeyFromPosition.toBase58(),
+    match: marketPDA.equals(marketPubkeyFromPosition),
+  });
+  
+  // Use the market PDA from the position account, not the one we derived
+  // This is what Anchor will use when resolving the constraint
+  const actualMarketPDA = marketPubkeyFromPosition;
+  
+  // If they don't match, this explains the error!
+  if (!marketPDA.equals(actualMarketPDA)) {
+    console.warn("⚠️ WARNING: Market PDA mismatch!");
+    console.warn(`   Derived from market_id: ${marketPDA.toBase58()}`);
+    console.warn(`   From position account: ${actualMarketPDA.toBase58()}`);
+    console.warn(`   This means the position was created with a different market_id than expected.`);
+  }
+  
+  // Derive escrow PDA using the ACTUAL market PDA from the position account
+  const actualEscrowPDA = await getMarketEscrowPDAWithVerification(provider.connection, actualMarketPDA);
+  
+  console.log("🔍 Using Actual Market PDA for Escrow:", {
+    marketPDA: actualMarketPDA.toBase58(),
+    escrowPDA: actualEscrowPDA.toBase58(),
+    previousEscrowPDA: escrowPDA.toBase58(),
+    match: escrowPDA.equals(actualEscrowPDA),
+  });
+
+  // Discriminator for claim_payout - Anchor uses "global:<function_name>" format
   const discriminatorHash = require('crypto').createHash('sha256').update("global:claim_payout").digest();
   const discriminator = discriminatorHash.subarray(0, 8);
 
+  // Use the actual market and escrow PDAs from the position account
+  // This ensures they match what Anchor will derive when reading the position
+  const finalMarketPDA = actualMarketPDA;
+  const finalEscrowPDA = actualEscrowPDA;
+
+  console.log("🔍 Final Instruction Accounts:", {
+    market: finalMarketPDA.toBase58(),
+    escrow: finalEscrowPDA.toBase58(),
+    position: positionPDA.toBase58(),
+    user: provider.wallet.publicKey.toBase58(),
+  });
+
   const instruction = new TransactionInstruction({
     keys: [
-      { pubkey: marketPDA, isSigner: false, isWritable: true },
-      { pubkey: escrowPDA, isSigner: false, isWritable: true },
-      { pubkey: positionPDA, isSigner: false, isWritable: true },
-      { pubkey: provider.wallet.publicKey, isSigner: true, isWritable: true },
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+      { pubkey: finalMarketPDA, isSigner: false, isWritable: true },           // market
+      { pubkey: finalEscrowPDA, isSigner: false, isWritable: true },           // market_escrow
+      { pubkey: positionPDA, isSigner: false, isWritable: true },              // position
+      { pubkey: provider.wallet.publicKey, isSigner: true, isWritable: true }, // user
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false }, // system_program (NEW)
     ],
     programId: ORACLE_PROGRAM_ID,
     data: discriminator as any,
+  });
+
+  // Log the actual instruction data
+  console.log("🔍 Instruction Data:", {
+    discriminator: Array.from(new Uint8Array(discriminator)).map((b: number) => b.toString(16).padStart(2, '0')).join(''),
+    programId: ORACLE_PROGRAM_ID.toBase58(),
+    keysCount: instruction.keys.length,
   });
 
   const tx = new Transaction().add(instruction);

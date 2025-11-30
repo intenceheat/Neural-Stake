@@ -1,24 +1,24 @@
 const { Connection, Keypair, PublicKey, Transaction, TransactionInstruction, SystemProgram } = require('@solana/web3.js');
 const fs = require('fs');
 
-const PROGRAM_ID = new PublicKey('49ZgXvL4bGZfiTNojjGAigh5FpxccpJ6K9z3VL2LtvYe');
+const PROGRAM_ID = new PublicKey('BhCVTNcTnrzRxZSayuX3kYBJZ36mUk5VB7C7k6uuhpDj');
 
 const markets = [
   {
-    id: 'sol-tps-10k-dec2025',
-    question: 'Will Solana TPS exceed 10,000 sustained for 1 hour by December 31, 2025?',
+    id: 'eth-etf-q4-2025',
+    question: 'Will an Ethereum Spot ETF be approved by December 31, 2025?',
     endTime: Math.floor(new Date('2025-12-31').getTime() / 1000),
   },
   {
-    id: 'jup-2dollar-jan2026',
-    question: 'Will Jupiter (JUP) hit $2.00 by January 31, 2026?',
-    endTime: Math.floor(new Date('2026-01-31').getTime() / 1000),
+    id: 'solana-100usd-jul2026',
+    question: 'Will Solana (SOL) trade above $100 at any time before July 1, 2026?',
+    endTime: Math.floor(new Date('2026-07-01').getTime() / 1000),
   },
   {
-    id: 'bonk-burn-q1-2026',
-    question: 'Will BONK burn 1 trillion tokens in Q1 2026?',
-    endTime: Math.floor(new Date('2026-03-31').getTime() / 1000),
-  },
+    id: 'ai-100m-users-2026',
+    question: 'Will any AI agent platform surpass 100 million monthly active users by June 30, 2026?',
+    endTime: Math.floor(new Date('2026-06-30').getTime() / 1000),
+  }
 ];
 
 async function createMarket(connection, payer, market) {

@@ -87,7 +87,8 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
         claimed: false,
         payout_amount: 0,
         transaction_signature: result.signature,
-      });
+        onchain_timestamp: result.timestamp,
+});
 
       // Show success state
       setSuccess(true);
