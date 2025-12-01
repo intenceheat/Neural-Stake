@@ -103,10 +103,21 @@ export function PositionsView() {
         positionTimestamp
       );
   
+      // Calculate actual payout from market pools
+      const totalPool = pos.market.pool_yes + pos.market.pool_no;
+      const winningPool = pos.market.winning_outcome?.toUpperCase() === "YES" 
+        ? pos.market.pool_yes 
+        : pos.market.pool_no;
+  
+      const actualPayout = winningPool > 0 
+        ? (totalPool * pos.stake_amount) / winningPool 
+        : 0;
+  
       console.log("✅ Signature:", signature);
-      
-      await positionService.claim(pos.id, pos.potential_payout);
-      toast.success(`Claim submitted: ${signature.slice(0, 8)}...`);
+      console.log("💰 Actual Payout:", actualPayout);
+  
+      await positionService.claim(pos.id, actualPayout);
+      toast.success(`Claimed ${actualPayout.toFixed(2)} SOL!`);
       await fetchPositions();
     } catch (error: any) {
       console.error("❌ ERROR:", error);

@@ -36,3 +36,4 @@ yarn-error.log*
 next-env.d.ts
 solana-release/
 solana.tar.bz2
+scripts/

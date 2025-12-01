@@ -1,4 +1,4 @@
-// components/oracle/StakeModal.tsx - YOUR VERSION + ON-CHAIN INTEGRATION
+// components/oracle/StakeModal.tsx - FIXED WITH DYNAMIC ODDS
 
 "use client";
 
@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, AlertCircle } from "lucide-react";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { getProvider, placeStake, Outcome } from "@/lib/solana/oracle-program";
-import { positionService } from "@/lib/supabase";
+import { positionService, supabase } from "@/lib/supabase";
 
 interface StakeModalProps {
   isOpen: boolean;
@@ -15,8 +15,8 @@ interface StakeModalProps {
   market: {
     id: string;
     question: string;
-    oddsYes: number;
-    oddsNo: number;
+    poolYes: number;
+    poolNo: number;
   };
   onSuccess?: () => void;
 }
@@ -30,11 +30,36 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // ADD THIS - Convert string pools to numbers
+  const poolYes = parseFloat(market.poolYes as any) || 0;
+  const poolNo = parseFloat(market.poolNo as any) || 0;
+
+  const getCurrentOdds = () => {
+    const total = poolYes + poolNo; // USE poolYes/poolNo instead of market.poolYes/poolNo
+    if (total === 0) {
+      return { oddsYes: 50, oddsNo: 50 };
+    }
+    return {
+      oddsYes: Math.round((poolYes / total) * 100),
+      oddsNo: Math.round((poolNo / total) * 100)
+    };
+  };
+
   const calculatePayout = () => {
     const stake = parseFloat(amount) || 0;
-    const odds = outcome === "YES" ? market.oddsYes : market.oddsNo;
-    if (odds === 0) return 0;
-    return stake * (100 / odds);
+    if (stake === 0) return 0;
+    
+    const totalPool = poolYes + poolNo; // USE poolYes/poolNo
+    
+    if (totalPool === 0) {
+      return stake * 2;
+    }
+    
+    const outcomePool = outcome === "YES" ? poolYes : poolNo; // USE poolYes/poolNo
+    const newOutcomePool = outcomePool + stake;
+    const newTotalPool = totalPool + stake;
+    
+    return (newTotalPool * stake) / newOutcomePool;
   };
 
   const calculateProfit = () => {
@@ -45,7 +70,7 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
   const calculateROI = () => {
     const stake = parseFloat(amount) || 0;
     if (stake === 0) return 0;
-    return ((calculatePayout() / stake - 1) * 100);
+    return (calculateProfit() / stake) * 100;
   };
 
   const handleStake = async () => {
@@ -64,19 +89,27 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
     setError(null);
 
     try {
+      console.log("🔍 Starting stake:", { marketId: market.id, amount: stakeAmount, outcome });
+      
       // Get Anchor provider
       const wallet = { publicKey, signTransaction, signAllTransactions: async (txs: any) => txs };
       const provider = getProvider(wallet as any, connection);
+
+      console.log("🔍 Got provider, calling placeStake...");
 
       // Call on-chain place_stake
       const selectedOutcome = outcome === "YES" ? Outcome.Yes : Outcome.No;
       const result = await placeStake(provider, market.id, stakeAmount, selectedOutcome);
 
-      console.log("✅ Transaction signature:", result.signature);
+      console.log("✅ On-chain success:", result.signature);
       console.log("✅ Position PDA:", result.positionPDA.toBase58());
+      console.log("🔍 Saving position to Supabase...");
+
+      // Get current odds for saving
+      const currentOdds = getCurrentOdds();
+      const odds = outcome === "YES" ? currentOdds.oddsYes : currentOdds.oddsNo;
 
       // Save to Supabase for tracking
-      const odds = outcome === "YES" ? market.oddsYes : market.oddsNo;
       await positionService.create({
         market_id: market.id,
         user_wallet: publicKey.toBase58(),
@@ -88,7 +121,32 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
         payout_amount: 0,
         transaction_signature: result.signature,
         onchain_timestamp: result.timestamp,
-});
+      });
+      
+      console.log("✅ Position saved");
+      console.log("🔍 Updating market pools...");
+      
+      const { data: currentMarket } = await supabase
+        .from('markets')
+        .select('pool_yes, pool_no')
+        .eq('market_id', market.id)
+        .single();
+
+      if (currentMarket) {
+        await supabase
+          .from('markets')
+          .update({
+            pool_yes: outcome === "YES" 
+              ? (parseFloat(currentMarket.pool_yes) + stakeAmount).toString()
+              : currentMarket.pool_yes,
+            pool_no: outcome === "NO"
+              ? (parseFloat(currentMarket.pool_no) + stakeAmount).toString()
+              : currentMarket.pool_no,
+          })
+          .eq('market_id', market.id);
+      }
+
+      console.log("✅ Pools updated, all done!");
 
       // Show success state
       setSuccess(true);
@@ -102,7 +160,10 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
 
     } catch (err: any) {
       console.error('❌ Stake error:', err);
-      setError(err.message || 'Failed to place stake. Please try again.');
+      console.error('❌ Error type:', typeof err);
+      console.error('❌ Error keys:', Object.keys(err));
+      console.error('❌ Error stringified:', JSON.stringify(err, Object.getOwnPropertyNames(err), 2));
+      setError(err.message || err.toString() || 'Failed to place stake. Please try again.');
     } finally {
       setIsStaking(false);
     }
@@ -115,6 +176,8 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
     setOutcome("YES");
     onClose();
   };
+
+  const currentOdds = getCurrentOdds();
 
   return (
     <AnimatePresence>
@@ -294,7 +357,7 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
                 <div className="flex justify-between items-center p-2 bg-slate-800/30 rounded">
                   <span className="text-slate-400">Current Odds:</span>
                   <span className="text-white font-bold font-mono">
-                    YES {market.oddsYes}% • NO {market.oddsNo}%
+                    YES {currentOdds.oddsYes}% • NO {currentOdds.oddsNo}%
                   </span>
                 </div>
               </div>

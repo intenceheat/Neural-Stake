@@ -216,16 +216,16 @@ export function MarketsView() {
       {/* Stake Modal */}
       {selectedMarket && (
         <StakeModal
-          isOpen={isStakeModalOpen}
-          onClose={() => setIsStakeModalOpen(false)}
-          market={{
-            id: selectedMarket.market_id,
-            question: selectedMarket.question,
-            oddsYes: calculateOdds(selectedMarket).oddsYes,
-            oddsNo: calculateOdds(selectedMarket).oddsNo,
-          }}
-          onSuccess={refreshMarkets}
-        />
+        isOpen={isStakeModalOpen}
+        onClose={() => setIsStakeModalOpen(false)}
+        market={{
+          id: selectedMarket.market_id,
+          question: selectedMarket.question,
+          poolYes: selectedMarket.pool_yes,
+          poolNo: selectedMarket.pool_no,
+        }}
+        onSuccess={refreshMarkets}
+      />
       )}
     </div>
   );
