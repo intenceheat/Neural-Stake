@@ -8,16 +8,25 @@ import { StakeModal } from "@/components/oracle/StakeModal";
 import { OddsTicker } from "@/components/oracle/OddsTicker";
 import { ActivityFeed } from "@/components/oracle/ActivityFeed";
 import { WalletButton } from "@/components/wallet/WalletButton";
-import { marketService, type Market } from "@/lib/supabase";
+import { marketService, positionService, type Market } from "@/lib/supabase";
 
 export function HomeView() {
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [isStakeModalOpen, setIsStakeModalOpen] = useState(false);
   const [markets, setMarkets] = useState<Market[]>([]);
+  const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalVolume, setTotalVolume] = useState(0);
+  const [totalPredictors, setTotalPredictors] = useState(0);
 
   useEffect(() => {
     fetchMarkets();
+    fetchActivities();
+    fetchStats();
+    
+    // Refresh activities every 10 seconds for real-time feed
+    const activityInterval = setInterval(fetchActivities, 10000);
+    return () => clearInterval(activityInterval);
   }, []);
 
   async function fetchMarkets() {
@@ -31,36 +40,71 @@ export function HomeView() {
     }
   }
 
-  const refreshMarkets = async () => {
-    await fetchMarkets();
+  async function fetchStats() {
+    try {
+      const { supabase } = await import("@/lib/supabase");
+      
+      // Get total volume
+      const { data: positions } = await supabase
+        .from("positions")
+        .select("stake_amount, user_wallet");
+      
+      if (positions) {
+        const volume = positions.reduce((sum, pos) => sum + pos.stake_amount, 0);
+        setTotalVolume(volume);
+        
+        // Get unique predictors
+        const uniqueCount = new Set(positions.map(p => p.user_wallet)).size;
+        setTotalPredictors(uniqueCount);
+      }
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  }
+
+  async function fetchActivities() {
+    try {
+      const { data, error } = await (await import("@/lib/supabase")).supabase
+        .from("positions")
+        .select("user_wallet, stake_amount, outcome, created_at")
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      if (error) throw error;
+
+      const formatted = (data || []).map((pos: any) => ({
+        id: pos.user_wallet + pos.created_at,
+        wallet: pos.user_wallet.slice(0, 4) + "..." + pos.user_wallet.slice(-4),
+        outcome: pos.outcome.toUpperCase() as "YES" | "NO",
+        amount: pos.stake_amount,
+        reputation: Math.random() * 3 + 0.5,
+        timestamp: formatTimeAgo(new Date(pos.created_at)),
+      }));
+
+      setActivities(formatted);
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+      setActivities([]);
+    }
+  }
+
+  const formatTimeAgo = (date: Date) => {
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return "now";
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
   };
 
-  const mockActivities = [
-    {
-      id: "1",
-      wallet: "ABC123...XYZ789",
-      outcome: "YES" as const,
-      amount: 5.0,
-      reputation: 2.3,
-      timestamp: "2m ago",
-    },
-    {
-      id: "2",
-      wallet: "DEF456...UVW012",
-      outcome: "NO" as const,
-      amount: 2.5,
-      reputation: 1.8,
-      timestamp: "5m ago",
-    },
-    {
-      id: "3",
-      wallet: "GHI789...RST345",
-      outcome: "YES" as const,
-      amount: 1.0,
-      reputation: 1.2,
-      timestamp: "8m ago",
-    },
-  ];
+  const refreshMarkets = async () => {
+    await fetchMarkets();
+    await fetchStats();
+  };
 
   const handleMarketClick = (market: Market) => {
     setSelectedMarket(market);
@@ -224,7 +268,7 @@ export function HomeView() {
               <div className="flex items-center justify-center gap-6 mb-12">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-amber-400">
-                    {markets.reduce((sum, m) => sum + m.total_volume, 0).toFixed(1)} SOL
+                    {totalVolume.toFixed(1)} SOL
                   </div>
                   <div className="text-sm text-slate-500">Total Volume</div>
                 </div>
@@ -236,7 +280,7 @@ export function HomeView() {
                 <div className="w-px h-12 bg-slate-700" />
                 <div className="text-center">
                   <div className="text-3xl font-bold text-amber-400">
-                    {markets.reduce((sum, m) => sum + m.participant_count, 0)}
+                    {totalPredictors}
                   </div>
                   <div className="text-sm text-slate-500">Predictors</div>
                 </div>
@@ -254,14 +298,6 @@ export function HomeView() {
                     <h3 className="text-2xl font-orbitron font-bold text-white">
                       Active Markets
                     </h3>
-                    <div className="flex gap-2">
-                      <button className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm transition-colors">
-                        Active
-                      </button>
-                      <button className="px-4 py-2 bg-slate-800/50 hover:bg-slate-700 rounded-lg text-sm text-slate-400 transition-colors">
-                        Resolved
-                      </button>
-                    </div>
                   </div>
 
                   <div className="space-y-4">
@@ -288,7 +324,7 @@ export function HomeView() {
 
                 {/* Activity Feed Sidebar */}
                 <div className="lg:col-span-1">
-                  <ActivityFeed activities={mockActivities} />
+                  <ActivityFeed activities={activities.length > 0 ? activities : []} />
                 </div>
               </div>
             </div>
@@ -304,8 +340,8 @@ export function HomeView() {
           market={{
             id: selectedMarket.market_id,
             question: selectedMarket.question,
-            oddsYes: calculateOdds(selectedMarket).oddsYes,
-            oddsNo: calculateOdds(selectedMarket).oddsNo,
+            poolYes: selectedMarket.pool_yes,
+            poolNo: selectedMarket.pool_no,
           }}
           onSuccess={refreshMarkets}
         />

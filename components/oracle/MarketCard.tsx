@@ -15,8 +15,8 @@ interface MarketCardProps {
   participants: number;
   timeRemaining: string;
   onClick?: () => void;
-  isResolved?: boolean; // NEW PROP
-  winningOutcome?: "YES" | "NO" | null; // NEW PROP
+  isResolved?: boolean;
+  winningOutcome?: "YES" | "NO" | null;
 }
 
 export function MarketCard({
@@ -30,8 +30,8 @@ export function MarketCard({
   participants,
   timeRemaining,
   onClick,
-  isResolved = false, // DEFAULT FALSE
-  winningOutcome = null, // DEFAULT NULL
+  isResolved = false,
+  winningOutcome = null,
 }: MarketCardProps) {
   return (
     <motion.div
@@ -43,19 +43,9 @@ export function MarketCard({
         boxShadow: "0 0 20px rgba(245, 158, 11, 0.3)",
       } : {}}
       whileTap={!isResolved ? { scale: 0.98 } : {}}
-      onClick={isResolved ? undefined : onClick} // DISABLE CLICK IF RESOLVED
+      onClick={isResolved ? undefined : onClick}
       transition={{ duration: 0.2 }}
     >
-      {/* Resolved Badge */}
-      {isResolved && winningOutcome && (
-        <div className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-slate-800 rounded-full border border-slate-700">
-          <CheckCircle className="w-4 h-4 text-emerald-400" />
-          <span className="text-xs font-bold text-emerald-400">
-            RESOLVED: {winningOutcome}
-          </span>
-        </div>
-      )}
-
       {/* Hover glow effect (disabled if resolved) */}
       {!isResolved && (
         <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 to-amber-500/0 group-hover:from-amber-500/5 group-hover:to-transparent transition-all duration-300" />
@@ -76,11 +66,21 @@ export function MarketCard({
         {/* Content */}
         <div className="flex-1 min-w-0">
           {/* Question */}
-          <h3 className={`text-lg font-bold text-white mb-3 line-clamp-2 transition-colors ${
+          <h3 className={`text-lg font-bold text-white mb-2 line-clamp-2 transition-colors ${
             !isResolved && "group-hover:text-amber-400"
           }`}>
             {question}
           </h3>
+
+          {/* Resolved Badge - MOVED HERE, NO OVERLAP */}
+          {isResolved && winningOutcome && (
+            <div className="mb-3 inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 rounded-full border border-emerald-500/30">
+              <CheckCircle className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs font-bold text-emerald-400">
+                RESOLVED: {winningOutcome}
+              </span>
+            </div>
+          )}
 
           {/* Odds Bar */}
           <div className="mb-4">

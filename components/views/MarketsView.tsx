@@ -59,7 +59,7 @@ export function MarketsView() {
     const now = new Date();
     const diff = end.getTime() - now.getTime();
     
-    if (diff <= 0) return "Ended";
+    if (diff <= 0) return "Terminated";
     
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -120,7 +120,7 @@ export function MarketsView() {
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
             }`}
           >
-            <span className="relative z-10">Active</span>
+            <span className="relative z-10">Live Contracts</span>
             {activeTab === "active" && (
               <motion.div
                 layoutId="activeTab"
@@ -140,7 +140,7 @@ export function MarketsView() {
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
             }`}
           >
-            <span className="relative z-10">Resolved</span>
+            <span className="relative z-10">Executed</span>
             {activeTab === "resolved" && (
               <motion.div
                 layoutId="activeTab"
@@ -169,7 +169,7 @@ export function MarketsView() {
                 </svg>
               </div>
               <p className="text-slate-400 text-xl font-light mb-2">
-                No {activeTab === "active" ? "active" : "resolved"} markets available
+                No {activeTab === "active" ? "live" : "executed"} contracts available
               </p>
               <p className="text-slate-500 text-sm">
                 Check back soon for new prediction opportunities
@@ -203,7 +203,7 @@ export function MarketsView() {
                     participants={market.participant_count}
                     timeRemaining={getTimeRemaining(market.end_time)}
                     onClick={() => handleMarketClick(market)}
-                    isResolved={market.status === "resolved"}  // ADD THIS LINE
+                    isResolved={market.status === "resolved"}
                     winningOutcome={market.winning_outcome as "YES" | "NO" | null} 
                   />
                 </motion.div>
@@ -229,4 +229,4 @@ export function MarketsView() {
       )}
     </div>
   );
-} 
+}
