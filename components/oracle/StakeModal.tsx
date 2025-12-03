@@ -1,8 +1,8 @@
-// components/oracle/StakeModal.tsx - FIXED WITH DYNAMIC ODDS
+// components/oracle/StakeModal.tsx - WITH SCROLL LOCK
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, AlertCircle } from "lucide-react";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
@@ -30,12 +30,23 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // ADD THIS - Convert string pools to numbers
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   const poolYes = parseFloat(market.poolYes as any) || 0;
   const poolNo = parseFloat(market.poolNo as any) || 0;
 
   const getCurrentOdds = () => {
-    const total = poolYes + poolNo; // USE poolYes/poolNo instead of market.poolYes/poolNo
+    const total = poolYes + poolNo;
     if (total === 0) {
       return { oddsYes: 50, oddsNo: 50 };
     }
@@ -49,13 +60,13 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
     const stake = parseFloat(amount) || 0;
     if (stake === 0) return 0;
     
-    const totalPool = poolYes + poolNo; // USE poolYes/poolNo
+    const totalPool = poolYes + poolNo;
     
     if (totalPool === 0) {
       return stake * 2;
     }
     
-    const outcomePool = outcome === "YES" ? poolYes : poolNo; // USE poolYes/poolNo
+    const outcomePool = outcome === "YES" ? poolYes : poolNo;
     const newOutcomePool = outcomePool + stake;
     const newTotalPool = totalPool + stake;
     
@@ -91,13 +102,11 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
     try {
       console.log("🔍 Starting stake:", { marketId: market.id, amount: stakeAmount, outcome });
       
-      // Get Anchor provider
       const wallet = { publicKey, signTransaction, signAllTransactions: async (txs: any) => txs };
       const provider = getProvider(wallet as any, connection);
 
       console.log("🔍 Got provider, calling placeStake...");
 
-      // Call on-chain place_stake
       const selectedOutcome = outcome === "YES" ? Outcome.Yes : Outcome.No;
       const result = await placeStake(provider, market.id, stakeAmount, selectedOutcome);
 
@@ -105,11 +114,9 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
       console.log("✅ Position PDA:", result.positionPDA.toBase58());
       console.log("🔍 Saving position to Supabase...");
 
-      // Get current odds for saving
       const currentOdds = getCurrentOdds();
       const odds = outcome === "YES" ? currentOdds.oddsYes : currentOdds.oddsNo;
 
-      // Save to Supabase for tracking
       await positionService.create({
         market_id: market.id,
         user_wallet: publicKey.toBase58(),
@@ -148,10 +155,8 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
 
       console.log("✅ Pools updated, all done!");
 
-      // Show success state
       setSuccess(true);
 
-      // Wait 2 seconds then close and refresh
       setTimeout(() => {
         setSuccess(false);
         onClose();
@@ -189,18 +194,17 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={resetAndClose}
-          />
+           />
 
           {/* Modal */}
           <motion.div
-            className="fixed inset-0 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ type: "spring", damping: 25 }}
           >
-            <div className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border-2 border-amber-500/20 relative">
+            <div className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border-2 border-amber-500/20 relative pointer-events-auto">
               {/* Corner accents */}
               <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-amber-500/50 rounded-tl-2xl" />
               <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-amber-500/50 rounded-br-2xl" />
