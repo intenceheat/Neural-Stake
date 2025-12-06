@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { SentimentOrb } from "./SentimentOrb";
 import { Clock, TrendingUp, Users, CheckCircle } from "lucide-react";
 
 interface MarketCardProps {
@@ -51,18 +50,7 @@ export function MarketCard({
         <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 to-amber-500/0 group-hover:from-amber-500/5 group-hover:to-transparent transition-all duration-300" />
       )}
 
-      <div className="relative flex items-start gap-4">
-        {/* Sentiment Orb */}
-        <div className="flex-shrink-0">
-          <SentimentOrb
-            sentimentScore={sentiment}
-            confidence={confidence}
-            volume={volume}
-            size="sm"
-            showLabel={false}
-          />
-        </div>
-
+      <div className="relative">
         {/* Content */}
         <div className="flex-1 min-w-0">
           {/* Question */}
@@ -72,7 +60,7 @@ export function MarketCard({
             {question}
           </h3>
 
-          {/* Resolved Badge - MOVED HERE, NO OVERLAP */}
+          {/* Resolved Badge */}
           {isResolved && winningOutcome && (
             <div className="mb-3 inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 rounded-full border border-emerald-500/30">
               <CheckCircle className="w-4 h-4 text-emerald-400" />
