@@ -3,78 +3,76 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { MarketCard } from "@/components/oracle/MarketCard";
-import { SentimentOrb } from "@/components/oracle/SentimentOrb";
 import { StakeModal } from "@/components/oracle/StakeModal";
 import { OddsTicker } from "@/components/oracle/OddsTicker";
 import { ActivityFeed } from "@/components/oracle/ActivityFeed";
 import { WalletButton } from "@/components/wallet/WalletButton";
-import { marketService, positionService, type Market } from "@/lib/supabase";
+import { marketService, type Market } from "@/lib/supabase";
 
 export function HomeView() {
-  const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
-  const [isStakeModalOpen, setIsStakeModalOpen] = useState(false);
-  const [markets, setMarkets] = useState<Market[]>([]);
-  const [activities, setActivities] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [totalVolume, setTotalVolume] = useState(0);
-  const [totalPredictors, setTotalPredictors] = useState(0);
+  const [selectedPredictionMarket, setSelectedPredictionMarket] = useState<Market | null>(null);
+  const [isPredictionModalOpen, setIsPredictionModalOpen] = useState(false);
+  const [predictionMarkets, setPredictionMarkets] = useState<Market[]>([]);
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [isLoadingMarkets, setIsLoadingMarkets] = useState(true);
+  const [aggregatedVolume, setAggregatedVolume] = useState(0);
+  const [uniquePredictors, setUniquePredictors] = useState(0);
 
   useEffect(() => {
-    fetchMarkets();
-    fetchActivities();
-    fetchStats();
+    loadPredictionMarkets();
+    loadRecentActivity();
+    loadPlatformStats();
     
-    const activityInterval = setInterval(fetchActivities, 10000);
-    return () => clearInterval(activityInterval);
+    const activityRefreshInterval = setInterval(loadRecentActivity, 10000);
+    return () => clearInterval(activityRefreshInterval);
   }, []);
 
-  // Modal scroll lock
   useEffect(() => {
-    if (isStakeModalOpen) {
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
+    if (isPredictionModalOpen) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
-      document.documentElement.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
+      document.documentElement.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = 'unset';
-      document.documentElement.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
+      document.documentElement.style.overflow = "unset";
     };
-  }, [isStakeModalOpen]);
+  }, [isPredictionModalOpen]);
 
-  async function fetchMarkets() {
+  async function loadPredictionMarkets() {
     try {
-      const data = await marketService.getActive();
-      setMarkets(data);
+      const marketData = await marketService.getActive();
+      setPredictionMarkets(marketData);
     } catch (error) {
-      console.error("Error fetching markets:", error);
+      console.error("Error loading prediction markets:", error);
     } finally {
-      setLoading(false);
+      setIsLoadingMarkets(false);
     }
   }
 
-  async function fetchStats() {
+  async function loadPlatformStats() {
     try {
       const { supabase } = await import("@/lib/supabase");
       
-      const { data: positions } = await supabase
+      const { data: positionData } = await supabase
         .from("positions")
         .select("stake_amount, user_wallet");
       
-      if (positions) {
-        const volume = positions.reduce((sum, pos) => sum + pos.stake_amount, 0);
-        setTotalVolume(volume);
+      if (positionData) {
+        const volumeSum = positionData.reduce((accumulator, position) => accumulator + position.stake_amount, 0);
+        setAggregatedVolume(volumeSum);
         
-        const uniqueCount = new Set(positions.map(p => p.user_wallet)).size;
-        setTotalPredictors(uniqueCount);
+        const uniqueWalletCount = new Set(positionData.map(position => position.user_wallet)).size;
+        setUniquePredictors(uniqueWalletCount);
       }
     } catch (error) {
-      console.error("Error fetching stats:", error);
+      console.error("Error loading platform stats:", error);
     }
   }
 
-  async function fetchActivities() {
+  async function loadRecentActivity() {
     try {
       const { data, error } = await (await import("@/lib/supabase")).supabase
         .from("positions")
@@ -84,80 +82,73 @@ export function HomeView() {
 
       if (error) throw error;
 
-      const formatted = (data || []).map((pos: any) => ({
-        id: pos.user_wallet + pos.created_at,
-        wallet: pos.user_wallet.slice(0, 4) + "..." + pos.user_wallet.slice(-4),
-        outcome: pos.outcome.toUpperCase() as "YES" | "NO",
-        amount: pos.stake_amount,
+      const formattedActivity = (data || []).map((position: any) => ({
+        id: position.user_wallet + position.created_at,
+        wallet: position.user_wallet.slice(0, 4) + "..." + position.user_wallet.slice(-4),
+        outcome: position.outcome.toUpperCase() as "YES" | "NO",
+        amount: position.stake_amount,
         reputation: Math.random() * 3 + 0.5,
-        timestamp: formatTimeAgo(new Date(pos.created_at)),
+        timestamp: calculateTimeAgo(new Date(position.created_at)),
       }));
 
-      setActivities(formatted);
+      setRecentActivity(formattedActivity);
     } catch (error) {
-      console.error("Error fetching activities:", error);
-      setActivities([]);
+      console.error("Error loading recent activity:", error);
+      setRecentActivity([]);
     }
   }
 
-  const formatTimeAgo = (date: Date) => {
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
+  const calculateTimeAgo = (timestamp: Date) => {
+    const currentTime = new Date();
+    const timeDifference = currentTime.getTime() - timestamp.getTime();
+    const minutesElapsed = Math.floor(timeDifference / 60000);
+    const hoursElapsed = Math.floor(timeDifference / 3600000);
+    const daysElapsed = Math.floor(timeDifference / 86400000);
 
-    if (minutes < 1) return "now";
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    return `${days}d ago`;
+    if (minutesElapsed < 1) return "now";
+    if (minutesElapsed < 60) return `${minutesElapsed}m ago`;
+    if (hoursElapsed < 24) return `${hoursElapsed}h ago`;
+    return `${daysElapsed}d ago`;
   };
 
-  const refreshMarkets = async () => {
-    await fetchMarkets();
-    await fetchStats();
+  const refreshAllMarketData = async () => {
+    await loadPredictionMarkets();
+    await loadPlatformStats();
   };
 
-  const handleMarketClick = (market: Market) => {
-    setSelectedMarket(market);
-    setIsStakeModalOpen(true);
+  const handlePredictionMarketClick = (market: Market) => {
+    setSelectedPredictionMarket(market);
+    setIsPredictionModalOpen(true);
   };
 
-  const calculateOdds = (market: Market) => {
-    const total = market.pool_yes + market.pool_no;
-    if (total === 0) {
+  const calculateMarketOdds = (market: Market) => {
+    const totalPool = market.pool_yes + market.pool_no;
+    if (totalPool === 0) {
       return { oddsYes: 50, oddsNo: 50 };
     }
-    const oddsYes = Math.round((market.pool_yes / total) * 100);
-    const oddsNo = 100 - oddsYes;
-    return { oddsYes, oddsNo };
+    const probabilityYes = Math.round((market.pool_yes / totalPool) * 100);
+    const probabilityNo = 100 - probabilityYes;
+    return { oddsYes: probabilityYes, oddsNo: probabilityNo };
   };
 
-  const getTimeRemaining = (endTime: string) => {
-    const end = new Date(endTime);
-    const now = new Date();
-    const diff = end.getTime() - now.getTime();
+  const calculateTimeRemaining = (endTimestamp: string) => {
+    const endDate = new Date(endTimestamp);
+    const currentDate = new Date();
+    const timeRemaining = endDate.getTime() - currentDate.getTime();
     
-    if (diff <= 0) return "Ended";
+    if (timeRemaining <= 0) return "Ended";
     
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const daysRemaining = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+    const hoursRemaining = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     
-    if (days > 0) return `${days}d ${hours}h`;
-    return `${hours}h`;
+    if (daysRemaining > 0) return `${daysRemaining}d ${hoursRemaining}h`;
+    return `${hoursRemaining}h`;
   };
 
-  const featuredMarket = markets[0];
+  const spotlightMarket = predictionMarkets[0];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
-      className="min-h-screen"
-    >
-      {/* Header - Always visible */}
+    <div className="min-h-screen">
       <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -207,7 +198,7 @@ export function HomeView() {
                 }}
               />
             </motion.div>
-            <h1 className="text-xl font-orbitron font-black uppercase tracking-wider text-amber-400">
+            <h1 className="text-xl font-space-grotesk font-black uppercase tracking-wider bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600 bg-clip-text text-transparent">
               Oracle Protocol
             </h1>
           </div>
@@ -215,135 +206,119 @@ export function HomeView() {
         </div>
       </header>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.3 }}
-        className="pt-16"
-      >
-        {loading ? (
+      <div className="pt-16">
+        {isLoadingMarkets ? (
           <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-            <div className="text-amber-400 text-2xl font-orbitron">
-              Loading markets...
+            <div className="text-amber-400 text-2xl font-space-grotesk font-bold">
+              Loading prediction markets...
             </div>
           </div>
-        ) : markets.length === 0 ? (
+        ) : predictionMarkets.length === 0 ? (
           <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
             <div className="text-center">
-              <div className="text-amber-400 text-2xl font-orbitron mb-4">
-                No active markets. Check back soon.
+              <div className="text-amber-400 text-2xl font-space-grotesk font-bold mb-4">
+                No active prediction markets available.
               </div>
-              <p className="text-slate-400 text-lg">
-                Connect your wallet to get started when markets are available.
+              <p className="text-slate-400 text-lg font-inter">
+                Connect your wallet to get started when markets launch.
               </p>
             </div>
           </div>
         ) : (
           <>
-            {/* Hero Section */}
+            {/* Hero Section - SENTIMENT ORB REMOVED */}
             <section className="container mx-auto px-4 py-12">
               <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-8">
-                  <div className="flex justify-center mb-6">
-                    <SentimentOrb
-                      sentimentScore={featuredMarket.sentiment_score}
-                      confidence={featuredMarket.sentiment_confidence}
-                      volume={featuredMarket.total_volume}
-                      size="xl"
-                    />
-                  </div>
-                  <h2 className="text-4xl md:text-5xl font-orbitron font-black text-white mb-4">
-                    PREDICT SOLANA'S FUTURE
+                  <h2 className="text-4xl md:text-5xl font-space-grotesk font-black text-white mb-4 tracking-tight">
+                    SHAPE THE FUTURE WITH CONVICTION
                   </h2>
-                  <p className="text-xl text-slate-400 mb-8">
-                    AI-powered prediction markets. Get paid for being right.
+                  <p className="text-xl text-slate-400 font-inter mb-8">
+                    AI-powered prediction markets. Bet on truth. Dominate uncertainty.
                   </p>
                 </div>
 
-                {/* Featured Market Odds */}
+                {/* Featured Market */}
                 <div className="bg-slate-900 border-2 border-amber-500/20 rounded-2xl p-8 mb-8">
                   <div className="text-center mb-4">
-                    <h3 className="text-sm text-slate-500 uppercase tracking-widest font-orbitron mb-2">
-                      Featured Market
+                    <h3 className="text-sm text-slate-500 uppercase tracking-widest font-space-grotesk font-bold mb-2">
+                      Featured Battleground
                     </h3>
-                    <p className="text-lg text-white font-bold mb-6">
-                      {featuredMarket.question}
+                    <p className="text-lg text-white font-inter font-semibold mb-6">
+                      {spotlightMarket.question}
                     </p>
                   </div>
                   <OddsTicker
-                    oddsYes={calculateOdds(featuredMarket).oddsYes}
-                    oddsNo={calculateOdds(featuredMarket).oddsNo}
+                    oddsYes={calculateMarketOdds(spotlightMarket).oddsYes}
+                    oddsNo={calculateMarketOdds(spotlightMarket).oddsNo}
                   />
                   <button
-                    onClick={() => handleMarketClick(featuredMarket)}
-                    className="w-full mt-6 py-3 bg-amber-500 hover:bg-amber-600 rounded-lg font-bold text-black transition-all hover:scale-105"
+                    onClick={() => handlePredictionMarketClick(spotlightMarket)}
+                    className="w-full mt-6 py-3 bg-amber-500 hover:bg-amber-600 rounded-lg font-space-grotesk font-bold text-black transition-all hover:scale-105"
                   >
-                    STAKE NOW →
+                    ENTER THE ARENA →
                   </button>
                 </div>
 
                 {/* Stats Row */}
                 <div className="flex items-center justify-center gap-6 mb-12">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-amber-400">
-                      {totalVolume.toFixed(1)} SOL
+                    <div className="text-3xl font-bold text-amber-400 font-space-grotesk">
+                      {aggregatedVolume.toFixed(1)} SOL
                     </div>
-                    <div className="text-sm text-slate-500">Total Volume</div>
+                    <div className="text-sm text-slate-500 font-inter">Total Deployed</div>
                   </div>
                   <div className="w-px h-12 bg-slate-700" />
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-amber-400">{markets.length}</div>
-                    <div className="text-sm text-slate-500">Active Markets</div>
+                    <div className="text-3xl font-bold text-amber-400 font-space-grotesk">{predictionMarkets.length}</div>
+                    <div className="text-sm text-slate-500 font-inter">Active Arenas</div>
                   </div>
                   <div className="w-px h-12 bg-slate-700" />
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-amber-400">
-                      {totalPredictors}
+                    <div className="text-3xl font-bold text-amber-400 font-space-grotesk">
+                      {uniquePredictors}
                     </div>
-                    <div className="text-sm text-slate-500">Predictors</div>
+                    <div className="text-sm text-slate-500 font-inter">Elite Operators</div>
                   </div>
                 </div>
               </div>
             </section>
 
-            {/* Markets Section */}
+            {/* Markets Grid */}
             <section className="container mx-auto px-4 py-12">
               <div className="max-w-6xl mx-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  {/* Markets List */}
                   <div className="lg:col-span-2">
                     <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-2xl font-orbitron font-bold text-white">
-                        Active Markets
+                      <h3 className="text-2xl font-space-grotesk font-black text-white tracking-tight">
+                        Active Battlegrounds
                       </h3>
                     </div>
 
                     <div className="space-y-4">
-                      {markets.map((market) => {
-                        const odds = calculateOdds(market);
+                      {predictionMarkets.map((market) => {
+                        const marketOdds = calculateMarketOdds(market);
                         return (
                           <MarketCard
                             key={market.id}
                             marketId={market.market_id}
                             question={market.question}
-                            oddsYes={odds.oddsYes}
-                            oddsNo={odds.oddsNo}
+                            oddsYes={marketOdds.oddsYes}
+                            oddsNo={marketOdds.oddsNo}
                             sentiment={market.sentiment_score}
                             confidence={market.sentiment_confidence}
                             volume={market.total_volume}
                             participants={market.participant_count}
-                            timeRemaining={getTimeRemaining(market.end_time)}
-                            onClick={() => handleMarketClick(market)}
+                            timeRemaining={calculateTimeRemaining(market.end_time)}
+                            onClick={() => handlePredictionMarketClick(market)}
                           />
                         );
                       })}
                     </div>
                   </div>
 
-                  {/* Activity Feed Sidebar */}
                   <div className="lg:col-span-1">
-                    <ActivityFeed activities={activities.length > 0 ? activities : []} />
+                    <ActivityFeed activities={recentActivity.length > 0 ? recentActivity : []} />
                   </div>
                 </div>
               </div>
@@ -351,24 +326,24 @@ export function HomeView() {
           </>
         )}
 
-        {/* Stake Modal */}
-        {selectedMarket && (
+        {selectedPredictionMarket && (
           <StakeModal
-            isOpen={isStakeModalOpen}
-            onClose={() => setIsStakeModalOpen(false)}
+            isOpen={isPredictionModalOpen}
+            onClose={() => setIsPredictionModalOpen(false)}
             market={{
-              id: selectedMarket.market_id,
-              question: selectedMarket.question,
-              poolYes: selectedMarket.pool_yes,
-              poolNo: selectedMarket.pool_no,
+              id: selectedPredictionMarket.market_id,
+              question: selectedPredictionMarket.question,
+              poolYes: selectedPredictionMarket.pool_yes,
+              poolNo: selectedPredictionMarket.pool_no,
             }}
-            onSuccess={refreshMarkets}
+            onSuccess={refreshAllMarketData}
           />
         )}
-      </motion.div>
+      </div>
 
-      {/* Global CSS */}
       <style jsx global>{`
+        @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap");
+
         html {
           overflow-y: scroll;
           overscroll-behavior-y: none;
@@ -377,9 +352,9 @@ export function HomeView() {
         
         body {
           overscroll-behavior-y: none;
+          font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
-        /* Hide scrollbar - Cross-browser */
         ::-webkit-scrollbar {
           width: 0px;
           height: 0px;
@@ -399,7 +374,14 @@ export function HomeView() {
           scrollbar-width: none;
         }
 
-        /* CSS Animations for logo */
+        .font-space-grotesk {
+          font-family: "Space Grotesk", monospace;
+        }
+
+        .font-inter {
+          font-family: "Inter", sans-serif;
+        }
+
         @keyframes spin-slow {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
@@ -433,6 +415,6 @@ export function HomeView() {
           animation: glow-pulse 2s ease-in-out infinite;
         }
       `}</style>
-    </motion.div>
+    </div>
   );
 }
