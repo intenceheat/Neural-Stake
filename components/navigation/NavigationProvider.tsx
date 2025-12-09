@@ -4,7 +4,7 @@
 
 import { createContext, useContext, useState, ReactNode } from "react"
 
-type ViewType = "home" | "positions" | "markets" | "leaderboard" | "intel"  // ← ADD "intel"
+type ViewType = "home" | "positions" | "markets" | "leaderboard" | "neural"
 
 interface NavigationContextType {
   activeView: ViewType

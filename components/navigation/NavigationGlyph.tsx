@@ -5,7 +5,7 @@ import { LucideIcon } from "lucide-react"
 import { useNavigation } from "./NavigationProvider"
 
 interface NavigationGlyphProps {
-  id: "home" | "positions" | "markets" | "leaderboard" | "intel"
+  id: "home" | "positions" | "markets" | "leaderboard" | "neural"
   label: string
   icon: LucideIcon
   shape: "hexagon" | "triangle" | "square" | "circle" | "diamond" | "octagon"

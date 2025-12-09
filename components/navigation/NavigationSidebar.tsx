@@ -12,7 +12,7 @@ const glyphs = [
   { id: "positions" as const, label: "Stakes", icon: StakesIcon, shape: "triangle" as const, waterColor: "#c084fc" },
   { id: "markets" as const, label: "Markets", icon: MarketsIcon, shape: "square" as const, waterColor: "#6ee7b7" },
   { id: "leaderboard" as const, label: "Rankings", icon: Crown, shape: "circle" as const, waterColor: "#e879f9" },
-  { id: "intel" as const, label: "Intel", icon: IntelIcon, shape: "hexagon" as const, waterColor: "#06b6d4" },
+  { id: "neural" as const, label: "Neural", icon: IntelIcon, shape: "hexagon" as const, waterColor: "#06b6d4" },
 ]
 
 export function NavigationSidebar() {

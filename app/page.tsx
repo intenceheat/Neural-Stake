@@ -10,6 +10,7 @@ import { HomeView } from "@/components/views/HomeView";
 import { PositionsView } from "@/components/views/PositionsView";
 import { MarketsView } from "@/components/views/MarketsView";
 import { LeaderboardView } from "@/components/views/LeaderboardView";
+import { OperationsView } from "@/components/views/OperationsView";
 
 export default function Page() {
   const { activeView } = useNavigation();
@@ -33,6 +34,7 @@ export default function Page() {
           {activeView === "positions" && <PositionsView key="positions" />}
           {activeView === "markets" && <MarketsView key="markets" />}
           {activeView === "leaderboard" && <LeaderboardView key="leaderboard" />}
+          {activeView === "neural" && <OperationsView key="neural" />}
         </AnimatePresence>
       </main>
     </>
