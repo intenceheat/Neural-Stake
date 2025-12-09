@@ -50,7 +50,7 @@ export function NavigationGlyph({ id, label, icon: Icon, shape, waterColor }: Na
       className="relative flex flex-col items-center gap-1 md:gap-2 py-1 md:py-2 w-full group"
     >
       {/* Glyph container - MOBILE RESPONSIVE */}
-      <div className="relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center">
+      <div className="relative w-16 h-16 md:w-16 md:h-16 flex items-center justify-center">
         {/* Outer rotating shape */}
         <motion.div
           className="absolute inset-0"
@@ -166,7 +166,7 @@ export function NavigationGlyph({ id, label, icon: Icon, shape, waterColor }: Na
             ease: "easeInOut",
           }}
         >
-          <Icon className="w-5 h-5 md:w-[26px] md:h-[26px]" strokeWidth={1.4} />
+         <Icon className="w-6 h-6 md:w-[26px] md:h-[26px]" strokeWidth={1.4} />
         </motion.div>
       </div>
 
