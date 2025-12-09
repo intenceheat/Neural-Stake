@@ -2,15 +2,17 @@
 
 "use client"
 
-import { Eye, Wallet, Grid3x3, Trophy } from "lucide-react"
+import { Crown } from "lucide-react"
+import { NexusIcon, StakesIcon, MarketsIcon, IntelIcon } from "./CustomGlyphIcons"
 import { NavigationGlyph } from "./NavigationGlyph"
 import { motion } from "framer-motion"
 
 const glyphs = [
-  { id: "home" as const, label: "Oracle", icon: Eye, shape: "hexagon" as const },
-  { id: "positions" as const, label: "Stakes", icon: Wallet, shape: "triangle" as const },
-  { id: "markets" as const, label: "Markets", icon: Grid3x3, shape: "square" as const },
-  { id: "leaderboard" as const, label: "Leaders", icon: Trophy, shape: "circle" as const },
+  { id: "home" as const, label: "Nexus", icon: NexusIcon, shape: "octagon" as const, waterColor: "#0f766e" },
+  { id: "positions" as const, label: "Stakes", icon: StakesIcon, shape: "triangle" as const, waterColor: "#c084fc" },
+  { id: "markets" as const, label: "Markets", icon: MarketsIcon, shape: "square" as const, waterColor: "#6ee7b7" },
+  { id: "leaderboard" as const, label: "Rankings", icon: Crown, shape: "circle" as const, waterColor: "#e879f9" },
+  { id: "intel" as const, label: "Intel", icon: IntelIcon, shape: "hexagon" as const, waterColor: "#06b6d4" },
 ]
 
 export function NavigationDrawer() {
@@ -29,6 +31,7 @@ export function NavigationDrawer() {
             label={glyph.label}
             icon={glyph.icon}
             shape={glyph.shape}
+            waterColor={glyph.waterColor}
           />
         ))}
       </div>

@@ -1,5 +1,3 @@
-// components/navigation/NavigationGlyph.tsx
-
 "use client"
 
 import { motion } from "framer-motion"
@@ -7,10 +5,11 @@ import { LucideIcon } from "lucide-react"
 import { useNavigation } from "./NavigationProvider"
 
 interface NavigationGlyphProps {
-  id: "home" | "positions" | "markets" | "leaderboard"
+  id: "home" | "positions" | "markets" | "leaderboard" | "intel"
   label: string
   icon: LucideIcon
-  shape: "hexagon" | "triangle" | "square" | "circle"
+  shape: "hexagon" | "triangle" | "square" | "circle" | "diamond" | "octagon"
+  waterColor: string
 }
 
 const shapeVariants = {
@@ -30,9 +29,17 @@ const shapeVariants = {
     path: "M14 2C7.4 2 2 7.4 2 14C2 20.6 7.4 26 14 26C20.6 26 26 20.6 26 14C26 7.4 20.6 2 14 2Z",
     viewBox: "0 0 28 28",
   },
+  diamond: {
+    path: "M14 2L26 14L14 26L2 14L14 2Z",
+    viewBox: "0 0 28 28",
+  },
+  octagon: {
+    path: "M10 2L18 2L26 10L26 18L18 26L10 26L2 18L2 10L10 2Z",
+    viewBox: "0 0 28 28",
+  },
 }
 
-export function NavigationGlyph({ id, label, icon: Icon, shape }: NavigationGlyphProps) {
+export function NavigationGlyph({ id, label, icon: Icon, shape, waterColor }: NavigationGlyphProps) {
   const { activeView, setActiveView } = useNavigation()
   const isActive = activeView === id
   const shapeData = shapeVariants[shape]
@@ -40,18 +47,18 @@ export function NavigationGlyph({ id, label, icon: Icon, shape }: NavigationGlyp
   return (
     <button
       onClick={() => setActiveView(id)}
-      className="relative flex flex-col items-center gap-2 py-2 w-full group"
+      className="relative flex flex-col items-center gap-1 md:gap-2 py-1 md:py-2 w-full group"
     >
-      {/* Glyph container */}
-      <div className="relative w-16 h-16 flex items-center justify-center">
-        {/* Outer rotating shape - SLOWER */}
+      {/* Glyph container - MOBILE RESPONSIVE */}
+      <div className="relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center">
+        {/* Outer rotating shape */}
         <motion.div
           className="absolute inset-0"
           animate={{
             rotate: isActive ? [0, 360] : [0, 180, 0],
           }}
           transition={{
-            duration: isActive ? 20 : 30, // SLOWED DOWN
+            duration: isActive ? 25 : 35,
             repeat: Infinity,
             ease: "linear",
           }}
@@ -59,20 +66,22 @@ export function NavigationGlyph({ id, label, icon: Icon, shape }: NavigationGlyp
           <svg
             viewBox={shapeData.viewBox}
             className="w-full h-full"
-            style={{ filter: "drop-shadow(0 0 8px currentColor)" }}
+            style={{ 
+              filter: `drop-shadow(0 0 8px ${waterColor}30)`,
+            }}
           >
             <motion.path
               d={shapeData.path}
               fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              className={isActive ? "text-amber-500/60" : "text-cyan-400/40"}
+              stroke={waterColor}
+              strokeWidth="1.2"
+              opacity={isActive ? 0.7 : 0.4}
               animate={{
-                strokeWidth: [1.5, 2.5, 1.5],
-                opacity: [0.4, 0.8, 0.4],
+                strokeWidth: [1.2, 2, 1.2],
+                opacity: isActive ? [0.7, 0.9, 0.7] : [0.4, 0.6, 0.4],
               }}
               transition={{
-                duration: 2,
+                duration: 3,
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
@@ -80,14 +89,14 @@ export function NavigationGlyph({ id, label, icon: Icon, shape }: NavigationGlyp
           </svg>
         </motion.div>
 
-        {/* Counter-rotating inner shape - SLOWER */}
+        {/* Counter-rotating inner shape */}
         <motion.div
-          className="absolute inset-2"
+          className="absolute inset-1.5 md:inset-2"
           animate={{
             rotate: isActive ? [0, -360] : [0, -180, 0],
           }}
           transition={{
-            duration: isActive ? 15 : 25, // SLOWED DOWN
+            duration: isActive ? 20 : 30,
             repeat: Infinity,
             ease: "linear",
           }}
@@ -95,20 +104,22 @@ export function NavigationGlyph({ id, label, icon: Icon, shape }: NavigationGlyp
           <svg
             viewBox={shapeData.viewBox}
             className="w-full h-full"
-            style={{ filter: "drop-shadow(0 0 6px currentColor)" }}
+            style={{ 
+              filter: `drop-shadow(0 0 6px ${waterColor}40)`,
+            }}
           >
             <motion.path
               d={shapeData.path}
               fill="none"
-              stroke="currentColor"
+              stroke={waterColor}
               strokeWidth="1"
-              className={isActive ? "text-amber-500/80" : "text-cyan-400/60"}
+              opacity={isActive ? 0.85 : 0.55}
               animate={{
-                scale: [1, 1.1, 1],
-                opacity: [0.6, 1, 0.6],
+                scale: [1, 1.08, 1],
+                opacity: isActive ? [0.85, 1, 0.85] : [0.55, 0.75, 0.55],
               }}
               transition={{
-                duration: 2.5,
+                duration: 3.5,
                 repeat: Infinity,
                 ease: "easeInOut",
                 delay: 0.5,
@@ -117,62 +128,63 @@ export function NavigationGlyph({ id, label, icon: Icon, shape }: NavigationGlyp
           </svg>
         </motion.div>
 
-        {/* Pulsing background */}
+        {/* Watercolor wash background */}
         <motion.div
-          className={`absolute inset-3 rounded-lg ${
-            isActive ? "bg-amber-500/20" : "bg-cyan-400/10"
-          }`}
+          className="absolute inset-2 md:inset-3 rounded-lg"
+          style={{
+            backgroundColor: `${waterColor}15`,
+            boxShadow: `inset 0 0 15px ${waterColor}20`,
+          }}
           animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.6, 0.3],
+            scale: [1, 1.15, 1],
+            opacity: isActive ? [0.4, 0.65, 0.4] : [0.2, 0.35, 0.2],
           }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-
-        {/* Icon */}
-        <motion.div
-          className={`relative z-10 transition-colors duration-300 ${
-            isActive ? "text-amber-500" : "text-cyan-400/70 group-hover:text-cyan-400"
-          }`}
-          animate={
-            isActive
-              ? {
-                  scale: [1, 1.1, 1],
-                  rotate: [0, 5, -5, 0],
-                }
-              : {}
-          }
           transition={{
             duration: 3,
             repeat: Infinity,
             ease: "easeInOut",
           }}
-        >
-          <Icon size={26} strokeWidth={1.5} />
-        </motion.div>
+        />
 
-        {/* REMOVED: Active particles */}
-        {/* REMOVED: Orbiting dot */}
+        {/* Icon - MOBILE RESPONSIVE */}
+        <motion.div
+          className="relative z-10 transition-colors duration-500"
+          style={{
+            color: isActive ? waterColor : `${waterColor}90`,
+          }}
+          animate={
+            isActive
+              ? {
+                  scale: [1, 1.12, 1],
+                  rotate: [0, 3, -3, 0],
+                }
+              : {}
+          }
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        >
+          <Icon className="w-5 h-5 md:w-[26px] md:h-[26px]" strokeWidth={1.4} />
+        </motion.div>
       </div>
 
-      {/* Label */}
+      {/* Label - MOBILE RESPONSIVE */}
       <motion.span
-        className={`text-[9px] font-bold uppercase tracking-[0.15em] transition-colors ${
-          isActive ? "text-amber-500" : "text-cyan-400/60 group-hover:text-cyan-400"
-        }`}
+        className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.12em] md:tracking-[0.15em] transition-colors duration-500"
+        style={{
+          color: isActive ? waterColor : `${waterColor}80`,
+        }}
         animate={
           isActive
             ? {
-                opacity: [0.8, 1, 0.8],
+                opacity: [0.85, 1, 0.85],
               }
             : {}
         }
         transition={{
-          duration: 2,
+          duration: 2.5,
           repeat: Infinity,
           ease: "easeInOut",
         }}
@@ -180,13 +192,16 @@ export function NavigationGlyph({ id, label, icon: Icon, shape }: NavigationGlyp
         {label}
       </motion.span>
 
-      {/* Active underline */}
+      {/* Active underline - MOBILE RESPONSIVE */}
       {isActive && (
         <motion.div
-          className="absolute bottom-0 left-1/2 w-8 h-0.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent"
+          className="absolute bottom-0 left-1/2 w-6 md:w-8 h-0.5"
+          style={{
+            background: `linear-gradient(to right, transparent, ${waterColor}, transparent)`,
+          }}
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.4 }}
         />
       )}
     </button>

@@ -1,6 +1,6 @@
-// app/page.tsx (FIX CONTENT OFFSET)
-
 "use client";
+
+// app/page.tsx
 
 import { AnimatePresence } from "framer-motion";
 import { useNavigation } from "@/components/navigation/NavigationProvider";

@@ -1,8 +1,10 @@
+// components/navigation/NavigationProvider.tsx
+
 "use client"
 
 import { createContext, useContext, useState, ReactNode } from "react"
 
-type ViewType = "home" | "positions" | "markets" | "leaderboard"
+type ViewType = "home" | "positions" | "markets" | "leaderboard" | "intel"  // ← ADD "intel"
 
 interface NavigationContextType {
   activeView: ViewType
