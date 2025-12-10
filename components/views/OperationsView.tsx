@@ -18,7 +18,7 @@ export function OperationsView() {
                 NEURAL EDGE
               </h1>
               <p className="text-slate-400 text-lg font-light">
-                AI-powered market intelligence and prediction analytics
+              Real-time market intelligence • Neural prediction engine
               </p>
             </div>
           </div>
