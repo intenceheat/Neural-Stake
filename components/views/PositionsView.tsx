@@ -306,7 +306,7 @@ export function PositionsView() {
                     whileHover={{ scale: 1.01 }}
                     className="bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-800/80 border-2 border-slate-700/50 rounded-xl p-6 hover:border-purple-500/30 transition-all duration-300 shadow-xl"
                   >
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex flex-col sm:flex-row items-start justify-between mb-4 gap-4">
                       <div className="flex-1">
                         <h3 className="text-xl font-bold text-white mb-3 font-orbitron tracking-tight">
                           {pos.market?.question || "UNKNOWN TARGET"}
@@ -332,17 +332,17 @@ export function PositionsView() {
                       </div>
 
                       {activeTab === "resolved" && (
-                        <div className="flex items-center gap-4">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
                           <div className="flex items-center gap-2">
-                          {isWinner ? (
+                            {isWinner ? (
                               <>
-                                <CheckCircle className="w-7 h-7 text-emerald-400" />
-                                <span className="text-emerald-400 font-orbitron font-black text-lg">VICTOR</span>
+                                <CheckCircle className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-400" />
+                                <span className="text-emerald-400 font-orbitron font-black text-base sm:text-lg">VICTOR</span>
                               </>
                             ) : (
                               <>
-                                <XCircle className="w-7 h-7 text-red-400" />
-                                <span className="text-red-400 font-orbitron font-black text-lg">ELIMINATED</span>
+                                <XCircle className="w-6 h-6 sm:w-7 sm:h-7 text-red-400" />
+                                <span className="text-red-400 font-orbitron font-black text-base sm:text-lg">ELIMINATED</span>
                               </>
                             )}
                           </div>
@@ -351,7 +351,7 @@ export function PositionsView() {
                             <button
                               onClick={() => handleClaim(pos)}
                               disabled={claimingId === pos.id}
-                              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-orbitron font-black uppercase tracking-wider transition-all ${
+                              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-orbitron font-black uppercase tracking-wider transition-all text-sm whitespace-nowrap ${
                                 claimingId === pos.id
                                   ? "bg-slate-700 text-slate-400 cursor-not-allowed"
                                   : "bg-gradient-to-r from-emerald-500 to-emerald-600 text-black hover:from-emerald-400 hover:to-emerald-500 shadow-lg shadow-emerald-500/50"
@@ -360,16 +360,16 @@ export function PositionsView() {
                               {claimingId === pos.id ? (
                                 <>
                                   <motion.div
-                                    className="w-5 h-5 border-2 border-emerald-400 border-t-transparent rounded-full"
+                                    className="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full"
                                     animate={{ rotate: 360 }}
                                     transition={{ duration: 0.8, repeat: Infinity }}
                                   />
-                                  Extracting...
+                                  CLAIMING...
                                 </>
                               ) : (
                                 <>
-                                  <Send className="w-5 h-5" />
-                                  EXTRACT SPOILS
+                                  <Send className="w-4 h-4" />
+                                  CLAIM
                                 </>
                               )}
                             </button>
