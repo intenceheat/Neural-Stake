@@ -88,8 +88,8 @@ export function MarketsView() {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="min-h-[70vh] flex items-center justify-center">
           <div className="relative w-20 h-20">
-            <div className="absolute inset-0 border-4 border-amber-500/20 rounded-full" />
-            <div className="absolute inset-0 border-4 border-transparent border-t-amber-500 rounded-full animate-spin" />
+            <div className="absolute inset-0 border-4 border-emerald-500/20 rounded-full" />
+            <div className="absolute inset-0 border-4 border-transparent border-t-emerald-500 rounded-full animate-spin" />
           </div>
         </div>
       </div>
@@ -103,8 +103,8 @@ export function MarketsView() {
           {/* Header - Sticky */}
           <div className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-sm pb-6 -mx-4 px-4 pt-4 border-b border-slate-800/50">
             <div className="relative">
-              <div className="absolute -top-4 -left-4 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl" />
-              <h1 className="text-5xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 mb-3 tracking-tight">
+              <div className="absolute -top-4 -left-4 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl" />
+              <h1 className="text-5xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-green-400 to-teal-400 mb-3 tracking-tight">
                 PREDICTION MARKETS
               </h1>
               <p className="text-slate-400 text-lg font-light">
@@ -124,7 +124,7 @@ export function MarketsView() {
               onClick={() => setActiveTab("active")}
               className={`relative px-8 py-3.5 font-orbitron font-bold rounded-lg transition-all duration-300 ${
                 activeTab === "active"
-                  ? "text-slate-900 bg-gradient-to-r from-amber-400 to-amber-500 shadow-lg shadow-amber-500/25"
+                  ? "text-slate-900 bg-gradient-to-r from-emerald-400 to-emerald-500 shadow-lg shadow-emerald-500/25"
                   : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
               }`}
             >
@@ -132,7 +132,7 @@ export function MarketsView() {
               {activeTab === "active" && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-500 rounded-lg"
+                  className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-lg"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}
@@ -144,7 +144,7 @@ export function MarketsView() {
               onClick={() => setActiveTab("resolved")}
               className={`relative px-8 py-3.5 font-orbitron font-bold rounded-lg transition-all duration-300 ${
                 activeTab === "resolved"
-                  ? "text-slate-900 bg-gradient-to-r from-amber-400 to-amber-500 shadow-lg shadow-amber-500/25"
+                  ? "text-slate-900 bg-gradient-to-r from-emerald-400 to-emerald-500 shadow-lg shadow-emerald-500/25"
                   : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
               }`}
             >
@@ -152,7 +152,7 @@ export function MarketsView() {
               {activeTab === "resolved" && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-500 rounded-lg"
+                  className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-lg"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}
