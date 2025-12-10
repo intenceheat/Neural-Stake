@@ -149,197 +149,167 @@ export function HomeView() {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <motion.div
-              className="relative w-8 h-8"
-              animate={{
-                rotate: [0, 360],
-              }}
-              transition={{
-                duration: 20,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            >
-              <svg viewBox="0 0 28 28" className="w-full h-full">
-                <motion.path
-                  d="M14 2.5L24 8.5V19.5L14 25.5L4 19.5V8.5L14 2.5Z"
-                  fill="none"
-                  stroke="url(#glowGradient)"
-                  strokeWidth="2"
-                  animate={{
-                    opacity: [0.6, 1, 0.6],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
-                <defs>
-                  <linearGradient id="glowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#f59e0b" />
-                    <stop offset="100%" stopColor="#ea580c" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-orange-600/20 rounded-lg blur-sm"
-                animate={{
-                  scale: [1, 1.3, 1],
-                  opacity: [0.3, 0.6, 0.3],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            </motion.div>
-            <h1 className="text-xl font-space-grotesk font-black uppercase tracking-wider bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600 bg-clip-text text-transparent">
-              Oracle Protocol
-            </h1>
-          </div>
-          <WalletButton />
-        </div>
-      </header>
-
-      <div className="pt-16">
-        {isLoadingMarkets ? (
-          <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-            <div className="text-amber-400 text-2xl font-space-grotesk font-bold">
-              Loading prediction markets...
-            </div>
-          </div>
-        ) : predictionMarkets.length === 0 ? (
-          <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-amber-400 text-2xl font-space-grotesk font-bold mb-4">
-                No active prediction markets available.
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="space-y-10">
+          {/* Header - Sticky */}
+          <div className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-sm pb-6 -mx-4 px-4 pt-4 border-b border-slate-800/50">
+            <div className="flex items-center justify-between">
+              <div className="relative">
+                <div className="absolute -top-4 -left-4 w-32 h-32 bg-teal-500/5 rounded-full blur-3xl" />
+                <h1 className="text-5xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-cyan-400 to-emerald-400 mb-3 tracking-tight">
+                  ORACLE PROTOCOL
+                </h1>
+                <p className="text-slate-400 text-lg font-light">
+                  Stake on outcomes. Shape the future. Earn rewards.
+                </p>
               </div>
-              <p className="text-slate-400 text-lg font-inter">
-                Connect your wallet to get started when markets launch.
-              </p>
+              <WalletButton />
             </div>
           </div>
-        ) : (
-          <>
-            {/* Hero Section - SENTIMENT ORB REMOVED */}
-            <section className="container mx-auto px-4 py-12">
-              <div className="max-w-4xl mx-auto">
-                <div className="text-center mb-8">
-                  <h2 className="text-4xl md:text-5xl font-space-grotesk font-black text-white mb-4 tracking-tight">
-                    SHAPE THE FUTURE WITH CONVICTION
-                  </h2>
-                  <p className="text-xl text-slate-400 font-inter mb-8">
-                    AI-powered prediction markets. Bet on truth. Dominate uncertainty.
-                  </p>
-                </div>
 
-                {/* Featured Market */}
-                <div className="bg-slate-900 border-2 border-amber-500/20 rounded-2xl p-8 mb-8">
-                  <div className="text-center mb-4">
-                    <h3 className="text-sm text-slate-500 uppercase tracking-widest font-space-grotesk font-bold mb-2">
-                      Featured Battleground
-                    </h3>
-                    <p className="text-lg text-white font-inter font-semibold mb-6">
-                      {spotlightMarket.question}
+          {/* Content */}
+          {isLoadingMarkets ? (
+            <div className="min-h-[60vh] flex items-center justify-center">
+              <div className="text-teal-400 text-2xl font-space-grotesk font-bold">
+                Loading prediction markets...
+              </div>
+            </div>
+          ) : predictionMarkets.length === 0 ? (
+            <div className="min-h-[60vh] flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-teal-400 text-2xl font-space-grotesk font-bold mb-4">
+                  No active prediction markets available.
+                </div>
+                <p className="text-slate-400 text-lg font-inter">
+                  Connect your wallet to get started when markets launch.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Hero Section */}
+              <motion.section
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+              >
+                <div className="max-w-4xl mx-auto">
+                  <div className="text-center mb-8">
+                    <h2 className="text-4xl md:text-5xl font-space-grotesk font-black text-white mb-4 tracking-tight">
+                      SHAPE THE FUTURE WITH CONVICTION
+                    </h2>
+                    <p className="text-xl text-slate-400 font-inter mb-8">
+                      AI-powered prediction markets. Bet on truth. Dominate uncertainty.
                     </p>
                   </div>
-                  <OddsTicker
-                    oddsYes={calculateMarketOdds(spotlightMarket).oddsYes}
-                    oddsNo={calculateMarketOdds(spotlightMarket).oddsNo}
-                  />
-                  <button
-                    onClick={() => handlePredictionMarketClick(spotlightMarket)}
-                    className="w-full mt-6 py-3 bg-amber-500 hover:bg-amber-600 rounded-lg font-space-grotesk font-bold text-black transition-all hover:scale-105"
-                  >
-                    ENTER THE ARENA →
-                  </button>
-                </div>
 
-                {/* Stats Row */}
-                <div className="flex items-center justify-center gap-6 mb-12">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-amber-400 font-space-grotesk">
-                      {aggregatedVolume.toFixed(1)} SOL
-                    </div>
-                    <div className="text-sm text-slate-500 font-inter">Total Deployed</div>
-                  </div>
-                  <div className="w-px h-12 bg-slate-700" />
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-amber-400 font-space-grotesk">{predictionMarkets.length}</div>
-                    <div className="text-sm text-slate-500 font-inter">Active Arenas</div>
-                  </div>
-                  <div className="w-px h-12 bg-slate-700" />
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-amber-400 font-space-grotesk">
-                      {uniquePredictors}
-                    </div>
-                    <div className="text-sm text-slate-500 font-inter">Elite Operators</div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Markets Grid */}
-            <section className="container mx-auto px-4 py-12">
-              <div className="max-w-6xl mx-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  <div className="lg:col-span-2">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-2xl font-space-grotesk font-black text-white tracking-tight">
-                        Active Battlegrounds
+                  {/* Featured Market */}
+                  <div className="bg-slate-900 border-2 border-teal-500/20 rounded-2xl p-8 mb-8">
+                    <div className="text-center mb-4">
+                      <h3 className="text-sm text-slate-500 uppercase tracking-widest font-space-grotesk font-bold mb-2">
+                        Featured Battleground
                       </h3>
+                      <p className="text-lg text-white font-inter font-semibold mb-6">
+                        {spotlightMarket.question}
+                      </p>
                     </div>
-
-                    <div className="space-y-4">
-                      {predictionMarkets.map((market) => {
-                        const marketOdds = calculateMarketOdds(market);
-                        return (
-                          <MarketCard
-                            key={market.id}
-                            marketId={market.market_id}
-                            question={market.question}
-                            oddsYes={marketOdds.oddsYes}
-                            oddsNo={marketOdds.oddsNo}
-                            sentiment={market.sentiment_score}
-                            confidence={market.sentiment_confidence}
-                            volume={market.total_volume}
-                            participants={market.participant_count}
-                            timeRemaining={calculateTimeRemaining(market.end_time)}
-                            onClick={() => handlePredictionMarketClick(market)}
-                          />
-                        );
-                      })}
-                    </div>
+                    <OddsTicker
+                      oddsYes={calculateMarketOdds(spotlightMarket).oddsYes}
+                      oddsNo={calculateMarketOdds(spotlightMarket).oddsNo}
+                    />
+                    <button
+                      onClick={() => handlePredictionMarketClick(spotlightMarket)}
+                      className="w-full mt-6 py-3 bg-teal-500 hover:bg-teal-600 rounded-lg font-space-grotesk font-bold text-white transition-all hover:scale-105"
+                    >
+                      ENTER THE ARENA →
+                    </button>
                   </div>
 
-                  <div className="lg:col-span-1">
-                    <ActivityFeed activities={recentActivity.length > 0 ? recentActivity : []} />
+                  {/* Stats Row */}
+                  <div className="flex items-center justify-center gap-6 mb-12">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-teal-400 font-space-grotesk">
+                        {aggregatedVolume.toFixed(1)} SOL
+                      </div>
+                      <div className="text-sm text-slate-500 font-inter">Total Deployed</div>
+                    </div>
+                    <div className="w-px h-12 bg-slate-700" />
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-teal-400 font-space-grotesk">{predictionMarkets.length}</div>
+                      <div className="text-sm text-slate-500 font-inter">Active Arenas</div>
+                    </div>
+                    <div className="w-px h-12 bg-slate-700" />
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-teal-400 font-space-grotesk">
+                        {uniquePredictors}
+                      </div>
+                      <div className="text-sm text-slate-500 font-inter">Elite Operators</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </section>
-          </>
-        )}
+              </motion.section>
 
-        {selectedPredictionMarket && (
-          <StakeModal
-            isOpen={isPredictionModalOpen}
-            onClose={() => setIsPredictionModalOpen(false)}
-            market={{
-              id: selectedPredictionMarket.market_id,
-              question: selectedPredictionMarket.question,
-              poolYes: selectedPredictionMarket.pool_yes,
-              poolNo: selectedPredictionMarket.pool_no,
-            }}
-            onSuccess={refreshAllMarketData}
-          />
-        )}
+              {/* Markets Grid */}
+              <motion.section
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+              >
+                <div className="max-w-6xl mx-auto">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-2xl font-space-grotesk font-black text-white tracking-tight">
+                          Active Battlegrounds
+                        </h3>
+                      </div>
+
+                      <div className="space-y-4">
+                        {predictionMarkets.map((market) => {
+                          const marketOdds = calculateMarketOdds(market);
+                          return (
+                            <MarketCard
+                              key={market.id}
+                              marketId={market.market_id}
+                              question={market.question}
+                              oddsYes={marketOdds.oddsYes}
+                              oddsNo={marketOdds.oddsNo}
+                              sentiment={market.sentiment_score}
+                              confidence={market.sentiment_confidence}
+                              volume={market.total_volume}
+                              participants={market.participant_count}
+                              timeRemaining={calculateTimeRemaining(market.end_time)}
+                              onClick={() => handlePredictionMarketClick(market)}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="lg:col-span-1">
+                      <ActivityFeed activities={recentActivity.length > 0 ? recentActivity : []} />
+                    </div>
+                  </div>
+                </div>
+              </motion.section>
+            </>
+          )}
+        </div>
       </div>
+
+      {selectedPredictionMarket && (
+        <StakeModal
+          isOpen={isPredictionModalOpen}
+          onClose={() => setIsPredictionModalOpen(false)}
+          market={{
+            id: selectedPredictionMarket.market_id,
+            question: selectedPredictionMarket.question,
+            poolYes: selectedPredictionMarket.pool_yes,
+            poolNo: selectedPredictionMarket.pool_no,
+          }}
+          onSuccess={refreshAllMarketData}
+        />
+      )}
 
       <style jsx global>{`
         @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap");
@@ -380,39 +350,6 @@ export function HomeView() {
 
         .font-inter {
           font-family: "Inter", sans-serif;
-        }
-
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-
-        @keyframes pulse-glow {
-          0%, 100% { opacity: 0.6; }
-          50% { opacity: 1; }
-        }
-
-        @keyframes glow-pulse {
-          0%, 100% { 
-            transform: scale(1);
-            opacity: 0.3; 
-          }
-          50% { 
-            transform: scale(1.3);
-            opacity: 0.6; 
-          }
-        }
-
-        .animate-spin-slow {
-          animation: spin-slow 20s linear infinite;
-        }
-
-        .animate-pulse-glow {
-          animation: pulse-glow 2s ease-in-out infinite;
-        }
-
-        .animate-glow-pulse {
-          animation: glow-pulse 2s ease-in-out infinite;
         }
       `}</style>
     </div>
