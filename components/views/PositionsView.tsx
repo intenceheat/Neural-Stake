@@ -1,4 +1,4 @@
-// components/views/PositionsView.tsx - TACTICAL WARFARE INTERFACE - CONSISTENT
+// components/views/PositionsView.tsx
 
 "use client";
 
@@ -177,7 +177,7 @@ export function PositionsView() {
         <div className="container mx-auto px-4 py-8 max-w-6xl">
           <div className="min-h-[60vh] flex items-center justify-center">
             <motion.div
-              className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full"
+              className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full"
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             />
@@ -193,11 +193,12 @@ export function PositionsView() {
     <div className="min-h-screen">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="space-y-10">
-          {/* HEADER - Sticky (matching MarketsView) */}
+          {/* HEADER - Sticky */}
           <div className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-sm pb-6 -mx-4 px-4 pt-4 border-b border-slate-800/50">
             <div className="relative">
+              <div className="absolute -top-4 -left-4 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl" />
               <div className="md:pl-2">
-                <h1 className="text-5xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 mb-3 tracking-tight">
+                <h1 className="text-5xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-violet-400 to-fuchsia-400 mb-3 tracking-tight">
                   COMBAT POSITIONS
                 </h1>
                 <p className="text-slate-400 text-lg font-light">
@@ -213,13 +214,13 @@ export function PositionsView() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-800/90 border-2 border-amber-500/20 rounded-xl p-6 shadow-xl shadow-amber-500/5 hover:border-amber-500/40 transition-all"
+              className="bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-800/90 border-2 border-purple-500/20 rounded-xl p-6 shadow-xl shadow-purple-500/5 hover:border-purple-500/40 transition-all"
             >
-              <div className="text-xs text-amber-500/70 uppercase tracking-[0.2em] font-orbitron mb-3 font-bold">
+              <div className="text-xs text-purple-500/70 uppercase tracking-[0.2em] font-orbitron mb-3 font-bold">
                 TOTAL DEPLOYED
               </div>
-              <div className="text-4xl font-black text-amber-400 font-mono tracking-tight">
-                {totalStaked.toFixed(2)} <span className="text-2xl text-amber-500/60">SOL</span>
+              <div className="text-4xl font-black text-purple-400 font-mono tracking-tight">
+                {totalStaked.toFixed(2)} <span className="text-2xl text-purple-500/60">SOL</span>
               </div>
             </motion.div>
 
@@ -227,9 +228,9 @@ export function PositionsView() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-800/90 border-2 border-emerald-500/20 rounded-xl p-6 shadow-xl shadow-emerald-500/5 hover:border-emerald-500/40 transition-all"
+              className="bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-800/90 border-2 border-violet-500/20 rounded-xl p-6 shadow-xl shadow-violet-500/5 hover:border-violet-500/40 transition-all"
             >
-              <div className="text-xs text-emerald-500/70 uppercase tracking-[0.2em] font-orbitron mb-3 font-bold">
+              <div className="text-xs text-violet-500/70 uppercase tracking-[0.2em] font-orbitron mb-3 font-bold">
                 NET PROFIT/LOSS
               </div>
               <div className={`text-4xl font-black font-mono tracking-tight ${totalProfit >= 0 ? "text-emerald-400" : "text-red-400"}`}>
@@ -241,13 +242,13 @@ export function PositionsView() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-800/90 border-2 border-red-500/20 rounded-xl p-6 shadow-xl shadow-red-500/5 hover:border-red-500/40 transition-all"
+              className="bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-800/90 border-2 border-fuchsia-500/20 rounded-xl p-6 shadow-xl shadow-fuchsia-500/5 hover:border-fuchsia-500/40 transition-all"
             >
-              <div className="text-xs text-red-500/70 uppercase tracking-[0.2em] font-orbitron mb-3 font-bold">
+              <div className="text-xs text-fuchsia-500/70 uppercase tracking-[0.2em] font-orbitron mb-3 font-bold">
                 KILL RATE
               </div>
-              <div className="text-4xl font-black text-red-400 font-mono tracking-tight">
-                {winRate.toFixed(0)}<span className="text-2xl text-red-500/60">%</span>
+              <div className="text-4xl font-black text-fuchsia-400 font-mono tracking-tight">
+                {winRate.toFixed(0)}<span className="text-2xl text-fuchsia-500/60">%</span>
               </div>
             </motion.div>
           </div>
@@ -258,7 +259,7 @@ export function PositionsView() {
               onClick={() => setActiveTab("active")}
               className={`px-8 py-3.5 font-orbitron font-bold rounded-lg transition-all duration-300 ${
                 activeTab === "active"
-                  ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black shadow-lg shadow-amber-500/25"
+                  ? "bg-gradient-to-r from-purple-400 to-purple-500 text-white shadow-lg shadow-purple-500/25"
                   : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
               }`}
             >
@@ -268,7 +269,7 @@ export function PositionsView() {
               onClick={() => setActiveTab("resolved")}
               className={`px-8 py-3.5 font-orbitron font-bold rounded-lg transition-all duration-300 ${
                 activeTab === "resolved"
-                  ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black shadow-lg shadow-amber-500/25"
+                  ? "bg-gradient-to-r from-purple-400 to-purple-500 text-white shadow-lg shadow-purple-500/25"
                   : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
               }`}
             >
@@ -303,7 +304,7 @@ export function PositionsView() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     whileHover={{ scale: 1.01 }}
-                    className="bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-800/80 border-2 border-slate-700/50 rounded-xl p-6 hover:border-amber-500/30 transition-all duration-300 shadow-xl"
+                    className="bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-800/80 border-2 border-slate-700/50 rounded-xl p-6 hover:border-purple-500/30 transition-all duration-300 shadow-xl"
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
@@ -399,7 +400,7 @@ export function PositionsView() {
                             <div className="text-xs text-slate-500 uppercase tracking-widest font-orbitron mb-2 font-bold">
                               CURRENT VALUE
                             </div>
-                            <div className="text-xl font-black text-amber-400 font-mono">
+                            <div className="text-xl font-black text-purple-400 font-mono">
                               {currentValue.toFixed(2)} SOL
                             </div>
                           </div>
