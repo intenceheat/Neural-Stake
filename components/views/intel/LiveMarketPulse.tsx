@@ -4,46 +4,10 @@
 
 import { motion } from 'framer-motion'
 import { TrendingUp, TrendingDown, Activity, RefreshCw } from 'lucide-react'
-import { useState } from 'react'
-
-interface MarketCard {
-  token: string
-  price: number
-  change24h: number
-  prediction: string
-  confidence: number
-  timestamp: string
-}
+import { useNeural } from '@/contexts/NeuralContext'
 
 export function LiveMarketPulse() {
-  const [marketData, setMarketData] = useState<MarketCard[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
-
-  const fetchData = async () => {
-    setIsLoading(true)
-    try {
-      const response = await fetch(process.env.NEXT_PUBLIC_CLOUDFLARE_WEBHOOK_URL!, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ zone: 'market-pulse' })
-      })
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      
-      const data = await response.json()
-      // Parse the nested json strings from Make.com
-      const parsedData = data.map((item: any) => JSON.parse(item.json))
-      setMarketData(parsedData)
-      setLastUpdate(new Date())
-    } catch (error) {
-      console.error('Failed to fetch market data:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const { marketData, isLoading, lastUpdate, fetchData } = useNeural();
 
   if (marketData.length === 0 && !isLoading) {
     return (
