@@ -9,10 +9,10 @@ import { motion } from "framer-motion";
 
 const glyphs = [
   { id: "home" as const, label: "Nexus", icon: NexusIcon, shape: "octagon" as const, waterColor: "#0f766e" },
-  { id: "positions" as const, label: "Stakes", icon: StakesIcon, shape: "triangle" as const, waterColor: "#c084fc" },
   { id: "markets" as const, label: "Markets", icon: MarketsIcon, shape: "square" as const, waterColor: "#6ee7b7" },
-  { id: "leaderboard" as const, label: "Rankings", icon: Crown, shape: "circle" as const, waterColor: "#e879f9" },
+  { id: "positions" as const, label: "Stakes", icon: StakesIcon, shape: "triangle" as const, waterColor: "#c084fc" },
   { id: "neural" as const, label: "Neural", icon: IntelIcon, shape: "hexagon" as const, waterColor: "#06b6d4" },
+  { id: "leaderboard" as const, label: "Rankings", icon: Crown, shape: "circle" as const, waterColor: "#e879f9" },
 ]
 
 export function NavigationSidebar() {
