@@ -74,7 +74,7 @@ export function MarketsView() {
     const now = new Date();
     const diff = end.getTime() - now.getTime();
     
-    if (diff <= 0) return "Terminated";
+    if (diff <= 0) return "Ended";
     
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -88,8 +88,8 @@ export function MarketsView() {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="min-h-[70vh] flex items-center justify-center">
           <div className="relative w-20 h-20">
-            <div className="absolute inset-0 border-4 border-emerald-500/20 rounded-full" />
-            <div className="absolute inset-0 border-4 border-transparent border-t-emerald-500 rounded-full animate-spin" />
+            <div className="absolute inset-0 border-4 border-teal-500/20 rounded-full" />
+            <div className="absolute inset-0 border-4 border-transparent border-t-teal-500 rounded-full animate-spin" />
           </div>
         </div>
       </div>
@@ -101,14 +101,14 @@ export function MarketsView() {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="space-y-10">
           {/* Header - Sticky */}
-          <div className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-sm pb-6 -mx-4 px-4 pt-4 border-b border-slate-800/50">
+          <div className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl pb-6 -mx-4 md:-mx-6 px-4 md:px-6 pt-4 border-b border-slate-800/50">
             <div className="relative">
-              <div className="absolute -top-4 -left-4 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl" />
-              <h1 className="text-5xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-green-400 to-teal-400 mb-3 tracking-tight">
-                PREDICTION MARKETS
+              <div className="absolute -top-4 -left-4 w-32 h-32 bg-teal-500/5 rounded-full blur-3xl" />
+              <h1 className="text-4xl md:text-5xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-cyan-400 to-emerald-400 mb-2 tracking-tight">
+                MARKET TARGETS
               </h1>
-              <p className="text-slate-400 text-lg font-light">
-                Stake on outcomes. Shape the future. Earn rewards.
+              <p className="text-slate-400 text-base md:text-lg font-light">
+                Deploy capital. Execute conviction. Dominate outcomes.
               </p>
             </div>
           </div>
@@ -124,7 +124,7 @@ export function MarketsView() {
               onClick={() => setActiveTab("active")}
               className={`relative px-8 py-3.5 font-orbitron font-bold rounded-lg transition-all duration-300 ${
                 activeTab === "active"
-                  ? "text-slate-900 bg-gradient-to-r from-emerald-400 to-emerald-500 shadow-lg shadow-emerald-500/25"
+                  ? "text-slate-900 bg-gradient-to-r from-teal-400 to-cyan-500 shadow-lg shadow-teal-500/25"
                   : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
               }`}
             >
@@ -132,7 +132,7 @@ export function MarketsView() {
               {activeTab === "active" && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-lg"
+                  className="absolute inset-0 bg-gradient-to-r from-teal-400 to-cyan-500 rounded-lg"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}
@@ -144,7 +144,7 @@ export function MarketsView() {
               onClick={() => setActiveTab("resolved")}
               className={`relative px-8 py-3.5 font-orbitron font-bold rounded-lg transition-all duration-300 ${
                 activeTab === "resolved"
-                  ? "text-slate-900 bg-gradient-to-r from-emerald-400 to-emerald-500 shadow-lg shadow-emerald-500/25"
+                  ? "text-slate-900 bg-gradient-to-r from-teal-400 to-cyan-500 shadow-lg shadow-teal-500/25"
                   : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
               }`}
             >
@@ -152,7 +152,7 @@ export function MarketsView() {
               {activeTab === "resolved" && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-lg"
+                  className="absolute inset-0 bg-gradient-to-r from-teal-400 to-cyan-500 rounded-lg"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}

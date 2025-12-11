@@ -169,8 +169,9 @@ export function HomeView() {
         {/* Content */}
         {isLoadingMarkets ? (
           <div className="min-h-[60vh] flex items-center justify-center">
-            <div className="text-teal-400 text-xl md:text-2xl font-space-grotesk font-bold">
-              Loading prediction markets...
+            <div className="relative w-20 h-20">
+              <div className="absolute inset-0 border-4 border-teal-500/20 rounded-full" />
+              <div className="absolute inset-0 border-4 border-transparent border-t-teal-500 rounded-full animate-spin" />
             </div>
           </div>
         ) : predictionMarkets.length === 0 ? (

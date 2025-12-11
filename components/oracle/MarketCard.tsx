@@ -39,7 +39,7 @@ export function MarketCard({
       }`}
       whileHover={!isResolved ? {
         scale: 1.02,
-        boxShadow: "0 0 20px rgba(245, 158, 11, 0.3)",
+        boxShadow: "0 0 20px rgba(20, 184, 166, 0.3)",
       } : {}}
       whileTap={!isResolved ? { scale: 0.98 } : {}}
       onClick={isResolved ? undefined : onClick}
@@ -47,7 +47,7 @@ export function MarketCard({
     >
       {/* Hover glow effect (disabled if resolved) */}
       {!isResolved && (
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 to-amber-500/0 group-hover:from-amber-500/5 group-hover:to-transparent transition-all duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-500/0 to-teal-500/0 group-hover:from-teal-500/5 group-hover:to-transparent transition-all duration-300" />
       )}
 
       <div className="relative">
@@ -55,16 +55,16 @@ export function MarketCard({
         <div className="flex-1 min-w-0">
           {/* Question */}
           <h3 className={`text-lg font-bold text-white mb-2 line-clamp-2 transition-colors ${
-            !isResolved && "group-hover:text-amber-400"
+            !isResolved && "group-hover:text-teal-400"
           }`}>
             {question}
           </h3>
 
           {/* Resolved Badge */}
           {isResolved && winningOutcome && (
-            <div className="mb-3 inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 rounded-full border border-emerald-500/30">
-              <CheckCircle className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs font-bold text-emerald-400">
+            <div className="mb-3 inline-flex items-center gap-2 px-3 py-1.5 bg-teal-500/10 rounded-full border border-teal-500/30">
+              <CheckCircle className="w-4 h-4 text-teal-400" />
+              <span className="text-xs font-bold text-teal-400">
                 RESOLVED: {winningOutcome}
               </span>
             </div>
@@ -75,26 +75,26 @@ export function MarketCard({
             <div className="flex items-center justify-between text-sm mb-2">
               <span className={`font-bold ${
                 isResolved && winningOutcome === "YES" 
-                  ? "text-emerald-400" 
+                  ? "text-teal-400" 
                   : isResolved && winningOutcome === "NO"
-                  ? "text-emerald-400/30"
-                  : "text-emerald-400"
+                  ? "text-teal-400/30"
+                  : "text-teal-400"
               }`}>
                 YES {oddsYes}%
               </span>
               <span className={`font-bold ${
                 isResolved && winningOutcome === "NO" 
-                  ? "text-red-400" 
+                  ? "text-cyan-400" 
                   : isResolved && winningOutcome === "YES"
-                  ? "text-red-400/30"
-                  : "text-red-400"
+                  ? "text-cyan-400/30"
+                  : "text-cyan-400"
               }`}>
                 NO {oddsNo}%
               </span>
             </div>
             <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
               <motion.div
-                className="h-full bg-gradient-to-r from-emerald-500 to-amber-500"
+                className="h-full bg-gradient-to-r from-teal-500 to-cyan-500"
                 initial={{ width: "50%" }}
                 animate={{ width: `${oddsYes}%` }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
@@ -124,7 +124,7 @@ export function MarketCard({
               className="w-2 h-2 rounded-full"
               style={{
                 backgroundColor:
-                  sentiment > 0.3 ? "#10B981" : sentiment < -0.3 ? "#EF4444" : "#FBBF24",
+                  sentiment > 0.3 ? "#14B8A6" : sentiment < -0.3 ? "#06B6D4" : "#22D3EE",
               }}
             />
             <span className="text-xs font-medium text-slate-300">
@@ -139,12 +139,12 @@ export function MarketCard({
       <div className={`absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 rounded-tl-xl transition-colors ${
         isResolved 
           ? "border-slate-700" 
-          : "border-amber-500/20 group-hover:border-amber-500/50"
+          : "border-teal-500/20 group-hover:border-teal-500/50"
       }`} />
       <div className={`absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 rounded-br-xl transition-colors ${
         isResolved 
           ? "border-slate-700" 
-          : "border-amber-500/20 group-hover:border-amber-500/50"
+          : "border-teal-500/20 group-hover:border-teal-500/50"
       }`} />
     </motion.div>
   );
