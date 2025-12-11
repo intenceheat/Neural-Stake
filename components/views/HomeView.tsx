@@ -149,152 +149,169 @@ export function HomeView() {
 
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="space-y-10">
-          {/* Header - Sticky */}
-          <div className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-sm pb-6 -mx-4 px-4 pt-4 border-b border-slate-800/50">
-            <div className="flex items-center justify-between">
-              <div className="relative">
-                <div className="absolute -top-4 -left-4 w-32 h-32 bg-teal-500/5 rounded-full blur-3xl" />
-                <h1 className="text-5xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-cyan-400 to-emerald-400 mb-3 tracking-tight">
-                  ORACLE PROTOCOL
-                </h1>
-                <p className="text-slate-400 text-lg font-light">
-                  Stake on outcomes. Shape the future. Earn rewards.
-                </p>
-              </div>
-              <WalletButton />
+      <div className="container mx-auto px-4 md:px-6 py-6 md:py-10 max-w-7xl">
+        {/* Header - Sticky */}
+        <div className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl pb-6 -mx-4 md:-mx-6 px-4 md:px-6 pt-4 border-b border-slate-800/50 mb-12">
+          <div className="flex items-center justify-between">
+            <div className="relative">
+              <div className="absolute -top-4 -left-4 w-32 h-32 bg-teal-500/5 rounded-full blur-3xl" />
+              <h1 className="text-4xl md:text-5xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-cyan-400 to-emerald-400 mb-2 tracking-tight">
+                ORACLE PROTOCOL
+              </h1>
+              <p className="text-slate-400 text-base md:text-lg font-light">
+                Stake on outcomes. Shape the future. Earn rewards.
+              </p>
+            </div>
+            <WalletButton />
+          </div>
+        </div>
+
+        {/* Content */}
+        {isLoadingMarkets ? (
+          <div className="min-h-[60vh] flex items-center justify-center">
+            <div className="text-teal-400 text-xl md:text-2xl font-space-grotesk font-bold">
+              Loading prediction markets...
             </div>
           </div>
-
-          {/* Content */}
-          {isLoadingMarkets ? (
-            <div className="min-h-[60vh] flex items-center justify-center">
-              <div className="text-teal-400 text-2xl font-space-grotesk font-bold">
-                Loading prediction markets...
+        ) : predictionMarkets.length === 0 ? (
+          <div className="min-h-[60vh] flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-teal-400 text-xl md:text-2xl font-space-grotesk font-bold mb-4">
+                No active prediction markets available.
               </div>
+              <p className="text-slate-400 text-base md:text-lg font-inter">
+                Connect your wallet to get started when markets launch.
+              </p>
             </div>
-          ) : predictionMarkets.length === 0 ? (
-            <div className="min-h-[60vh] flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-teal-400 text-2xl font-space-grotesk font-bold mb-4">
-                  No active prediction markets available.
+          </div>
+        ) : (
+          <div className="space-y-16">
+            {/* Hero Section */}
+            <motion.section
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+            >
+              <div className="max-w-4xl mx-auto">
+                <div className="text-center mb-10">
+                  <h2 className="text-3xl md:text-5xl font-space-grotesk font-black text-white mb-4 tracking-tight leading-tight">
+                    SHAPE THE FUTURE WITH CONVICTION
+                  </h2>
+                  <p className="text-lg md:text-xl text-slate-400 font-inter">
+                    AI-powered prediction markets. Bet on truth. Dominate uncertainty.
+                  </p>
                 </div>
-                <p className="text-slate-400 text-lg font-inter">
-                  Connect your wallet to get started when markets launch.
-                </p>
-              </div>
-            </div>
-          ) : (
-            <>
-              {/* Hero Section */}
-              <motion.section
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
-              >
-                <div className="max-w-4xl mx-auto">
-                  <div className="text-center mb-8">
-                    <h2 className="text-4xl md:text-5xl font-space-grotesk font-black text-white mb-4 tracking-tight">
-                      SHAPE THE FUTURE WITH CONVICTION
-                    </h2>
-                    <p className="text-xl text-slate-400 font-inter mb-8">
-                      AI-powered prediction markets. Bet on truth. Dominate uncertainty.
+
+                {/* Featured Market */}
+                <div className="bg-gradient-to-br from-slate-900/90 via-slate-900/95 to-slate-800/90 border-2 border-teal-500/20 rounded-2xl p-6 md:p-8 mb-10 shadow-xl shadow-teal-500/5">
+                  <div className="text-center mb-6">
+                    <h3 className="text-xs text-teal-500/70 uppercase tracking-widest font-orbitron font-bold mb-3">
+                      FEATURED TARGET
+                    </h3>
+                    <p className="text-base md:text-lg text-white font-inter font-semibold leading-relaxed">
+                      {spotlightMarket.question}
                     </p>
                   </div>
+                  
+                  <OddsTicker
+                    oddsYes={calculateMarketOdds(spotlightMarket).oddsYes}
+                    oddsNo={calculateMarketOdds(spotlightMarket).oddsNo}
+                  />
+                  
+                  <button
+                    onClick={() => handlePredictionMarketClick(spotlightMarket)}
+                    className="group relative w-full mt-6 py-4 bg-teal-500/10 hover:bg-teal-500/20 border-2 border-teal-500 hover:border-teal-400 rounded-lg font-orbitron font-black text-teal-400 hover:text-teal-300 transition-all duration-300 uppercase tracking-wider backdrop-blur-sm overflow-hidden"
+                  >
+                    {/* Animated background shimmer on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-teal-400/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
+                    
+                    {/* Button content */}
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      DEPLOY CAPITAL
+                      <svg 
+                        className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </span>
+                    
+                    {/* Glow effect on hover */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl bg-teal-400/20" />
+                  </button>
+                </div>
 
-                  {/* Featured Market */}
-                  <div className="bg-slate-900 border-2 border-teal-500/20 rounded-2xl p-8 mb-8">
-                    <div className="text-center mb-4">
-                      <h3 className="text-sm text-slate-500 uppercase tracking-widest font-space-grotesk font-bold mb-2">
-                        Featured Battleground
+                {/* Stats Row */}
+                <div className="flex items-center justify-center gap-6 md:gap-12">
+                  <div className="text-center">
+                    <div className="text-2xl md:text-3xl font-bold text-teal-400 font-space-grotesk">
+                      {aggregatedVolume.toFixed(1)} SOL
+                    </div>
+                    <div className="text-xs md:text-sm text-slate-500 font-inter mt-1">Total Deployed</div>
+                  </div>
+                  <div className="w-px h-12 bg-slate-700" />
+                  <div className="text-center">
+                    <div className="text-2xl md:text-3xl font-bold text-teal-400 font-space-grotesk">{predictionMarkets.length}</div>
+                    <div className="text-xs md:text-sm text-slate-500 font-inter mt-1">Active Arenas</div>
+                  </div>
+                  <div className="w-px h-12 bg-slate-700" />
+                  <div className="text-center">
+                    <div className="text-2xl md:text-3xl font-bold text-teal-400 font-space-grotesk">
+                      {uniquePredictors}
+                    </div>
+                    <div className="text-xs md:text-sm text-slate-500 font-inter mt-1">Elite Operators</div>
+                  </div>
+                </div>
+              </div>
+            </motion.section>
+
+            {/* Markets Grid */}
+            <motion.section
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+            >
+              <div className="max-w-6xl mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  <div className="lg:col-span-2">
+                    <div className="flex items-center justify-between mb-8">
+                      <h3 className="text-2xl md:text-3xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-400 tracking-tight uppercase">
+                        Market Targets
                       </h3>
-                      <p className="text-lg text-white font-inter font-semibold mb-6">
-                        {spotlightMarket.question}
-                      </p>
                     </div>
-                    <OddsTicker
-                      oddsYes={calculateMarketOdds(spotlightMarket).oddsYes}
-                      oddsNo={calculateMarketOdds(spotlightMarket).oddsNo}
-                    />
-                    <button
-                      onClick={() => handlePredictionMarketClick(spotlightMarket)}
-                      className="w-full mt-6 py-3 bg-teal-500 hover:bg-teal-600 rounded-lg font-space-grotesk font-bold text-white transition-all hover:scale-105"
-                    >
-                      ENTER THE ARENA →
-                    </button>
+
+                    <div className="space-y-5">
+                      {predictionMarkets.map((market) => {
+                        const marketOdds = calculateMarketOdds(market);
+                        return (
+                          <MarketCard
+                            key={market.id}
+                            marketId={market.market_id}
+                            question={market.question}
+                            oddsYes={marketOdds.oddsYes}
+                            oddsNo={marketOdds.oddsNo}
+                            sentiment={market.sentiment_score}
+                            confidence={market.sentiment_confidence}
+                            volume={market.total_volume}
+                            participants={market.participant_count}
+                            timeRemaining={calculateTimeRemaining(market.end_time)}
+                            onClick={() => handlePredictionMarketClick(market)}
+                          />
+                        );
+                      })}
+                    </div>
                   </div>
 
-                  {/* Stats Row */}
-                  <div className="flex items-center justify-center gap-6 mb-12">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-teal-400 font-space-grotesk">
-                        {aggregatedVolume.toFixed(1)} SOL
-                      </div>
-                      <div className="text-sm text-slate-500 font-inter">Total Deployed</div>
-                    </div>
-                    <div className="w-px h-12 bg-slate-700" />
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-teal-400 font-space-grotesk">{predictionMarkets.length}</div>
-                      <div className="text-sm text-slate-500 font-inter">Active Arenas</div>
-                    </div>
-                    <div className="w-px h-12 bg-slate-700" />
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-teal-400 font-space-grotesk">
-                        {uniquePredictors}
-                      </div>
-                      <div className="text-sm text-slate-500 font-inter">Elite Operators</div>
-                    </div>
+                  <div className="lg:col-span-1">
+                    <ActivityFeed activities={recentActivity.length > 0 ? recentActivity : []} />
                   </div>
                 </div>
-              </motion.section>
-
-              {/* Markets Grid */}
-              <motion.section
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-              >
-                <div className="max-w-6xl mx-auto">
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2">
-                      <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-2xl font-space-grotesk font-black text-white tracking-tight">
-                          Active Battlegrounds
-                        </h3>
-                      </div>
-
-                      <div className="space-y-4">
-                        {predictionMarkets.map((market) => {
-                          const marketOdds = calculateMarketOdds(market);
-                          return (
-                            <MarketCard
-                              key={market.id}
-                              marketId={market.market_id}
-                              question={market.question}
-                              oddsYes={marketOdds.oddsYes}
-                              oddsNo={marketOdds.oddsNo}
-                              sentiment={market.sentiment_score}
-                              confidence={market.sentiment_confidence}
-                              volume={market.total_volume}
-                              participants={market.participant_count}
-                              timeRemaining={calculateTimeRemaining(market.end_time)}
-                              onClick={() => handlePredictionMarketClick(market)}
-                            />
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <div className="lg:col-span-1">
-                      <ActivityFeed activities={recentActivity.length > 0 ? recentActivity : []} />
-                    </div>
-                  </div>
-                </div>
-              </motion.section>
-            </>
-          )}
-        </div>
+              </div>
+            </motion.section>
+          </div>
+        )}
       </div>
 
       {selectedPredictionMarket && (
