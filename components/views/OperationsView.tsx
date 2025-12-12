@@ -3,10 +3,16 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import { LiveMarketPulse } from "./intel/LiveMarketPulse";
 import { RecentPredictions } from "./intel/RecentPredictions";
 
 export function OperationsView() {
+  // Scroll to top when view loads
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   return (
     <div className="min-h-screen">
       <div className="container mx-auto px-4 py-8 max-w-7xl">

@@ -40,6 +40,9 @@ export function LiveMarketPulse() {
 
       setSavedTokens(prev => ({ ...prev, [token]: true }));
       
+      // Dispatch custom event to trigger RecentPredictions update
+      window.dispatchEvent(new CustomEvent('prediction-saved'));
+      
       // Reset saved state after 2 seconds
       setTimeout(() => {
         setSavedTokens(prev => ({ ...prev, [token]: false }));

@@ -165,34 +165,35 @@ export function RecentPredictions() {
     }
   }, [connected, walletAddress, loadPredictions])
 
+  // Listen for save events from LiveMarketPulse
+  useEffect(() => {
+    const handlePredictionSaved = () => {
+      if (connected && walletAddress) {
+        loadPredictions()
+      }
+    }
+
+    window.addEventListener('prediction-saved', handlePredictionSaved)
+    return () => window.removeEventListener('prediction-saved', handlePredictionSaved)
+  }, [connected, walletAddress, loadPredictions])
+
   // Real-time subscription for instant updates
   useEffect(() => {
     if (!connected || !walletAddress) return
 
     const channel = supabase
-      .channel('saved_predictions_changes')
+      .channel(`saved_predictions_${walletAddress}`)
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*',
           schema: 'public',
           table: 'saved_predictions',
           filter: `user_wallet=eq.${walletAddress}`
         },
-        (payload) => {
-          setPredictions(prev => [payload.new as SavedPrediction, ...prev].slice(0, 10))
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'saved_predictions',
-          filter: `user_wallet=eq.${walletAddress}`
-        },
-        (payload) => {
-          setPredictions(prev => prev.filter(p => p.id !== (payload.old as any).id))
+        () => {
+          // Reload on any change
+          loadPredictions()
         }
       )
       .subscribe()
@@ -200,7 +201,7 @@ export function RecentPredictions() {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [connected, walletAddress])
+  }, [connected, walletAddress, loadPredictions])
 
   const handleDeleteWarning = useCallback((id: string) => {
     setDeleteWarningId(id)
@@ -222,7 +223,8 @@ export function RecentPredictions() {
 
       if (error) throw error
       
-      // Real-time subscription will handle the UI update
+      // Immediately update UI
+      setPredictions(prev => prev.filter(p => p.id !== id))
     } catch (error) {
       console.error('Error deleting prediction:', error)
       alert('Failed to delete prediction')
