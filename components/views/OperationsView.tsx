@@ -4,6 +4,7 @@
 
 import { motion } from "framer-motion";
 import { LiveMarketPulse } from "./intel/LiveMarketPulse";
+import { RecentPredictions } from "./intel/RecentPredictions";
 
 export function OperationsView() {
   return (
@@ -30,6 +31,15 @@ export function OperationsView() {
             transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
           >
             <LiveMarketPulse />
+          </motion.div>
+
+          {/* Recent Predictions */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+          >
+            <RecentPredictions />
           </motion.div>
         </div>
       </div>
