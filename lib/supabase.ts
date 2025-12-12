@@ -94,14 +94,42 @@ export const marketService = {
   },
 
   async getActive() {
-    const { data, error } = await supabase
+    const { data: markets, error } = await supabase
       .from('markets')
       .select('*')
       .eq('status', 'active')
       .order('end_time', { ascending: true });
     
     if (error) throw error;
-    return data as Market[];
+    
+    // Calculate real stats from positions for each market
+    const marketsWithStats = await Promise.all(
+      (markets || []).map(async (market) => {
+        const { data: positions } = await supabase
+          .from('positions')
+          .select('stake_amount, user_wallet')
+          .eq('market_id', market.market_id);
+        
+        if (!positions || positions.length === 0) {
+          return {
+            ...market,
+            total_volume: 0,
+            participant_count: 0
+          };
+        }
+        
+        const totalVolume = positions.reduce((sum, p) => sum + p.stake_amount, 0);
+        const uniqueParticipants = new Set(positions.map(p => p.user_wallet)).size;
+        
+        return {
+          ...market,
+          total_volume: totalVolume,
+          participant_count: uniqueParticipants
+        };
+      })
+    );
+    
+    return marketsWithStats as Market[];
   },
 
   async getById(marketId: string) {
