@@ -8,8 +8,6 @@ interface MarketCardProps {
   question: string;
   oddsYes: number;
   oddsNo: number;
-  sentiment: number;
-  confidence: number;
   volume: number;
   participants: number;
   timeRemaining: string;
@@ -23,8 +21,6 @@ export function MarketCard({
   question,
   oddsYes,
   oddsNo,
-  sentiment,
-  confidence,
   volume,
   participants,
   timeRemaining,
@@ -116,21 +112,6 @@ export function MarketCard({
               <Clock className="w-3 h-3" />
               <span>{timeRemaining}</span>
             </div>
-          </div>
-
-          {/* AI Sentiment Badge */}
-          <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 bg-slate-800/50 rounded-full border border-slate-700">
-            <div
-              className="w-2 h-2 rounded-full"
-              style={{
-                backgroundColor:
-                  sentiment > 0.3 ? "#14B8A6" : sentiment < -0.3 ? "#06B6D4" : "#22D3EE",
-              }}
-            />
-            <span className="text-xs font-medium text-slate-300">
-              AI: {sentiment > 0 ? "+" : ""}
-              {sentiment.toFixed(2)}
-            </span>
           </div>
         </div>
       </div>

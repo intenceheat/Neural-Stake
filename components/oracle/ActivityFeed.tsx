@@ -8,7 +8,6 @@ interface Activity {
   wallet: string;
   outcome: "YES" | "NO";
   amount: number;
-  reputation: number;
   timestamp: string;
 }
 
@@ -24,14 +23,6 @@ export function ActivityFeed({ activities, maxItems = 5 }: ActivityFeedProps) {
     return `${wallet.slice(0, 4)}...${wallet.slice(-4)}`;
   };
 
-  const getReputationTier = (rep: number) => {
-    if (rep >= 2.3) return { label: "Oracle", color: "text-purple-400" };
-    if (rep >= 2.0) return { label: "Master", color: "text-blue-400" };
-    if (rep >= 1.7) return { label: "Expert", color: "text-emerald-400" };
-    if (rep >= 1.3) return { label: "Veteran", color: "text-amber-400" };
-    return { label: "Novice", color: "text-slate-400" };
-  };
-
   return (
     <div className="space-y-3">
       <h3 className="text-lg font-orbitron font-bold text-white uppercase tracking-wider">
@@ -40,8 +31,6 @@ export function ActivityFeed({ activities, maxItems = 5 }: ActivityFeedProps) {
 
       <div className="space-y-2">
         {displayActivities.map((activity, index) => {
-          const tier = getReputationTier(activity.reputation);
-
           return (
             <motion.div
               key={activity.id}
@@ -68,9 +57,6 @@ export function ActivityFeed({ activities, maxItems = 5 }: ActivityFeedProps) {
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-sm font-mono text-slate-300">
                     {formatWallet(activity.wallet)}
-                  </span>
-                  <span className={`text-xs font-bold ${tier.color}`}>
-                    {tier.label}
                   </span>
                 </div>
                 <div className="text-xs text-slate-500">

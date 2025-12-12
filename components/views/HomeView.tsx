@@ -87,7 +87,6 @@ export function HomeView() {
         wallet: position.user_wallet.slice(0, 4) + "..." + position.user_wallet.slice(-4),
         outcome: position.outcome.toUpperCase() as "YES" | "NO",
         amount: position.stake_amount,
-        reputation: Math.random() * 3 + 0.5,
         timestamp: calculateTimeAgo(new Date(position.created_at)),
       }));
 
@@ -156,10 +155,10 @@ export function HomeView() {
             <div className="relative">
               <div className="absolute -top-4 -left-4 w-32 h-32 bg-teal-500/5 rounded-full blur-3xl" />
               <h1 className="text-4xl md:text-5xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-cyan-400 to-emerald-400 mb-2 tracking-tight">
-                ORACLE PROTOCOL
+                NEURAL STAKE
               </h1>
               <p className="text-slate-400 text-base md:text-lg font-light">
-                Stake on outcomes. Shape the future. Earn rewards.
+                Where conviction meets capital.
               </p>
             </div>
             <WalletButton />
@@ -196,10 +195,10 @@ export function HomeView() {
               <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-10">
                   <h2 className="text-3xl md:text-5xl font-space-grotesk font-black text-white mb-4 tracking-tight leading-tight">
-                    SHAPE THE FUTURE WITH CONVICTION
+                    CONVICTION IS CAPITAL
                   </h2>
                   <p className="text-lg md:text-xl text-slate-400 font-inter">
-                    AI-powered prediction markets. Bet on truth. Dominate uncertainty.
+                    AI-powered prediction markets. Stake your belief. Bank your edge.
                   </p>
                 </div>
 
@@ -293,8 +292,6 @@ export function HomeView() {
                             question={market.question}
                             oddsYes={marketOdds.oddsYes}
                             oddsNo={marketOdds.oddsNo}
-                            sentiment={market.sentiment_score}
-                            confidence={market.sentiment_confidence}
                             volume={market.total_volume}
                             participants={market.participant_count}
                             timeRemaining={calculateTimeRemaining(market.end_time)}
@@ -306,7 +303,7 @@ export function HomeView() {
                   </div>
 
                   <div className="lg:col-span-1">
-                    <ActivityFeed activities={recentActivity.length > 0 ? recentActivity : []} />
+                    <ActivityFeed activities={recentActivity} />
                   </div>
                 </div>
               </div>

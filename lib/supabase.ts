@@ -94,42 +94,14 @@ export const marketService = {
   },
 
   async getActive() {
-    const { data: markets, error } = await supabase
+    const { data, error } = await supabase
       .from('markets')
       .select('*')
       .eq('status', 'active')
       .order('end_time', { ascending: true });
     
     if (error) throw error;
-    
-    // Calculate real stats from positions for each market
-    const marketsWithStats = await Promise.all(
-      (markets || []).map(async (market) => {
-        const { data: positions } = await supabase
-          .from('positions')
-          .select('stake_amount, user_wallet')
-          .eq('market_id', market.market_id);
-        
-        if (!positions || positions.length === 0) {
-          return {
-            ...market,
-            total_volume: 0,
-            participant_count: 0
-          };
-        }
-        
-        const totalVolume = positions.reduce((sum, p) => sum + p.stake_amount, 0);
-        const uniqueParticipants = new Set(positions.map(p => p.user_wallet)).size;
-        
-        return {
-          ...market,
-          total_volume: totalVolume,
-          participant_count: uniqueParticipants
-        };
-      })
-    );
-    
-    return marketsWithStats as Market[];
+    return data as Market[];
   },
 
   async getById(marketId: string) {
@@ -174,8 +146,7 @@ export const marketService = {
       .from('markets')
       .update({ 
         pool_yes: poolYes,
-        pool_no: poolNo,
-        total_volume: poolYes + poolNo
+        pool_no: poolNo
       })
       .eq('market_id', marketId)
       .select()
