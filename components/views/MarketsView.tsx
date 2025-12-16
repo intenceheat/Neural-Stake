@@ -205,8 +205,6 @@ export function MarketsView() {
                       question={market.question}
                       oddsYes={odds.oddsYes}
                       oddsNo={odds.oddsNo}
-                      sentiment={market.sentiment_score}
-                      confidence={market.sentiment_confidence}
                       volume={market.total_volume}
                       participants={market.participant_count}
                       timeRemaining={getTimeRemaining(market.end_time)}
