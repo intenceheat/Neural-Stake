@@ -23,8 +23,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Oracle Protocol - AI-Powered Prediction Markets",
-  description: "Predict Solana's future. Get paid for being right.",
+  title: "Neural Stake - Where Conviction Meets Capital",
+  description: "AI-powered prediction markets. Stake your belief. Bank your edge.",
 };
 
 export default function RootLayout({
