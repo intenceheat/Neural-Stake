@@ -211,7 +211,7 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
           />
 
           {/* Modal Container - Mobile Optimized */}
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-hidden">
             <motion.div
               className="w-full max-w-md my-auto pointer-events-auto"
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -219,9 +219,10 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
             >
-              <div className="bg-slate-900/95 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-emerald-500/20 relative shadow-2xl shadow-emerald-500/10 max-h-[90vh] overflow-y-auto">
-                {/* Glow effect */}
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-cyan-500/20 rounded-xl sm:rounded-2xl blur-xl opacity-50 pointer-events-none" />
+              <div className="bg-slate-900/95 backdrop-blur-xl rounded-xl sm:rounded-2xl border-2 border-emerald-500/20 relative shadow-2xl shadow-emerald-500/10 max-h-[90vh] overflow-y-auto overscroll-contain">
+                <div className="p-4 sm:p-6">
+                  {/* Glow effect */}
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-cyan-500/20 rounded-xl sm:rounded-2xl blur-xl opacity-50 pointer-events-none" />
                 
                 {/* Content wrapper */}
                 <div className="relative">
@@ -428,6 +429,7 @@ export function StakeModal({ isOpen, onClose, market, onSuccess }: StakeModalPro
                         </>
                       )}
                     </motion.button>
+                  </div>
                   </div>
                 </div>
               </div>
