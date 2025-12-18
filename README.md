@@ -16,12 +16,12 @@ Neural Stake is a prediction market platform where you stake SOL on real-world o
 
 ---
 
-## 🎥 Demo
+## 💻 Theater
 
-- **Video:** https://youtu.be/lFu8grnuiL4
-- **Indie.fun Page:** [Next In]]
-- **GitHub:** [github.com/intenceheat/neural-stake](https://github.com/intenceheat/neural-stake)
-
+- **Live App:** [neural-stake.vercel.app](https://neural-stake.vercel.app)
+- **Video:** [youtu.be/lFu8grnuiL4](https://youtu.be/lFu8grnuiL4)
+- **Indie.fun:** [indie.fun/project-7QOD-42LW](https://indie.fun/project-7QOD-42LW)
+- **GitHub:** [github.com/intenceheat/Neural-Stake](https://github.com/intenceheat/Neural-Stake)
 ---
 
 ## 📸 Screenshots
@@ -32,7 +32,7 @@ Neural Stake is a prediction market platform where you stake SOL on real-world o
 
 ### Markets
 ![Markets](docs/images/markets.png)
-*Browse all active/resolved markets with AI sentiment*
+*Browse all active/resolved markets*
 
 ### Stakes (Positions)
 ![Stakes](docs/images/stakes.png)
@@ -71,7 +71,6 @@ Neural Stake is a prediction market platform where you stake SOL on real-world o
 - Browse all active and resolved prediction markets
 - Live/Executed tab system with market counts
 - Real-time odds calculation using constant product AMM
-- AI sentiment indicators (bullish/bearish signals)
 - Direct staking interface from market cards
 - Time remaining countdown on all markets
 - Emerald/green/teal theme
@@ -1010,7 +1009,7 @@ MIT License - see [LICENSE](LICENSE) for details
 
 - **GitHub:** [github.com/intenceheat/neural-stake](https://github.com/intenceheat/neural-stake)
 - **Video Theatre :**https://youtu.be/lFu8grnuiL4
-- **Indie.fun Page:** NextUP
+- **Indie.fun:** (https://indie.fun/project-7QOD-42LW
 - **Twitter:** NextUP
 - **Discord:** Coming in Hot
 - **Documentation:** Coming in Hot
