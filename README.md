@@ -100,6 +100,12 @@ Neural Stake is a prediction market platform where you stake SOL on real-world o
 - **Support/resistance level identification**
 - **Risk assessment with specific price targets**
 - **Downside protection levels**
+- **Saved Predictions (Wallet-Gated):**
+  - Bookmark any AI prediction with one click
+  - Predictions saved per wallet address
+  - View your saved predictions history
+  - Two-stage delete confirmation (trash → warning → delete)
+  - Instant save/delete updates with UI feedback
 - **Data persistence** across view switches via React Context
 - **Auto-refresh capability** with timestamp display
 - Cyan/purple/emerald neural network aesthetic
@@ -680,6 +686,7 @@ Click "Connect" in the top-right corner and approve the connection in your Solan
   - Detailed technical analysis
   - Support/resistance levels
   - Risk factors
+- Bookmark predictions for later reference (wallet required)
 - Data persists when switching views
 - Manual refresh available via refresh button
 
@@ -932,7 +939,7 @@ Priority areas:
 - [ ] Natural language market queries
 - [ ] Predictive analytics dashboard
 
-### **Phase 3: Decentralization** 
+### **Phase 3: Decentralization**
 - [ ] Chainlink/Pyth oracle integration for auto-resolution
 - [ ] Community governance via $NEURAL token
 - [ ] Decentralized market creation (permissionless)
@@ -948,7 +955,7 @@ Priority areas:
 - [ ] Trading API for bots/algos
 - [ ] Partner integrations (DeFi protocols, data providers)
 
-### **Phase 5: Scale** 
+### **Phase 5: Scale**
 - [ ] Cross-chain expansion (Ethereum L2s, Base, Arbitrum)
 - [ ] Advanced order types (limit orders, stop-loss)
 - [ ] Institutional tools (API, webhooks, analytics)
@@ -1008,8 +1015,8 @@ MIT License - see [LICENSE](LICENSE) for details
 ## 🔗 Links
 
 - **GitHub:** [github.com/intenceheat/neural-stake](https://github.com/intenceheat/neural-stake)
-- **Video Theatre :**https://youtu.be/lFu8grnuiL4
-- **Indie.fun:** (https://indie.fun/project-7QOD-42LW
+- **Video Theatre:** https://youtu.be/lFu8grnuiL4
+- **Indie.fun:** https://indie.fun/project-7QOD-42LW
 
 ---
 
