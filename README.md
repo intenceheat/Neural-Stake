@@ -19,7 +19,10 @@ Neural Stake is a prediction market platform where you stake SOL on real-world o
 ## 💻 Theater
 
 - **Live App:** [neural-stake.vercel.app](https://neural-stake.vercel.app)
-- **Video:** [youtu.be/lFu8grnuiL4](https://youtu.be/lFu8grnuiL4)
+- **Videos:**
+  - [Product Demo (UI Walkthrough)](https://youtu.be/lFu8grnuiL4)
+  - [Deep Dive (AI Narrated - 6min)](https://youtu.be/GbFQmryXQTE)
+  - [Quick Overview (AI Narrated - 2min)](https://youtu.be/cfZTEPUcQCE)
 - **Indie.fun:** [indie.fun/project-7QOD-42LW](https://indie.fun/project-7QOD-42LW)
 - **GitHub:** [github.com/intenceheat/Neural-Stake](https://github.com/intenceheat/Neural-Stake)
 ---
