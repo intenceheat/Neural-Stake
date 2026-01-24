@@ -164,7 +164,7 @@ User: "Activate Neural Scan"
 - Payout claimed → `update_user_stats` fires → winning_positions increments
 - No manual stat updates required
 
-### **Current State (Dec 14, 2025)**
+### **Current State**
 - ✅ Smart contract deployed and functional
 - ✅ 5 views with production-grade UI
 - ✅ AI predictions responding in <3 seconds
@@ -183,35 +183,71 @@ User: "Activate Neural Scan"
 
 ---
 
-## THE ASK
+## THE PATH FORWARD
 
-### **IMMEDIATE (Hackathon - Dec 2025)**
-Validation that prediction markets + AI intelligence is a viable wedge.
+### **PHASE 1: PRODUCTION HARDENING**
+Transition from devnet to mainnet-ready infrastructure.
 
-### **NEXT STRIKE**
-**Security audit** (Neodyme/OtterSec) - $25k-$50k  
-**Mainnet deployment** (production-grade infrastructure)  
-**Oracle integration** (Chainlink/Pyth for automated resolution)
+**Critical ops:**
+- Professional security audit (Neodyme/OtterSec/Quantstamp)
+- Oracle integration (Chainlink/Pyth for automated resolution)
+- Mainnet deployment with production monitoring
+- Legal/compliance framework establishment
 
-### **EXPANSION OPS**
-**Token launch** ($NEURAL for governance + liquidity mining)  
-**Mobile app** (React Native + Solana Mobile SDK)  
-**Institutional API** (trading bots + webhook integrations)
+### **PHASE 2: ECOSYSTEM EXPANSION**
+Build network effects and community engagement.
 
-### **FULL DOMINATION**
-**Cross-chain expansion** (Ethereum L2s, Base, Arbitrum)  
-**White-label solution** (partner protocols can deploy Neural Stake)  
-**Community governance** (decentralized market creation + resolution)
+**Growth vectors:**
+- Token launch ($NEURAL for governance + liquidity mining)
+- Mobile app (React Native + Solana Mobile SDK)
+- API for institutional traders and bot operators
+- Partner integrations (DeFi protocols, data providers)
 
-### **CAPITAL REQUIREMENTS**
-- **Decentralization:**  (audit + oracle integration + infrastructure)
-- **Growth:**  (token launch + mobile app + liquidity mining)
-- **Scale:** (cross-chain + institutional tools + partnerships)
+### **PHASE 3: SCALE OPERATIONS**
+Capture market share across chains and verticals.
 
-### **What's NOT an ask:**
-- Hype cycle participation
-- Narrative without execution
-- Promises without proof
+**Expansion targets:**
+- Cross-chain deployment (Ethereum L2s, Base, Arbitrum)
+- Advanced order types (limit orders, stop-loss)
+- White-label solution for partner protocols
+- Educational content and certification programs
+
+### **RESOURCE REQUIREMENTS**
+
+**Security & Infrastructure:**
+- Smart contract audit: $25k-$50k
+- Oracle integration development: $15k-$30k
+- Production infrastructure: $10k-$20k/year
+
+**Token Economics & Launch:**
+- Tokenomics design & legal: $30k-$50k
+- Liquidity provisioning: Variable (market-dependent)
+- Marketing & community building: $20k-$40k
+
+**Platform Development:**
+- Mobile app development: $40k-$60k
+- Cross-chain integration: $30k-$50k per chain
+- Advanced features & tooling: $25k-$40k
+
+### **SUPPORT MECHANISMS**
+
+**For builders/contributors:**
+- Open-source codebase (MIT license)
+- Developer documentation and API reference
+- Community Discord for technical discussions
+- Bounty program for feature development
+
+**For users/traders:**
+- Tutorial content and usage guides
+- Demo markets for practice
+- Community-driven market creation
+- Transparent performance metrics
+
+**For partners/protocols:**
+- Integration documentation
+- White-label deployment options
+- Revenue sharing models
+- Co-marketing opportunities
 
 ---
 
@@ -226,8 +262,6 @@ Neural Stake is operational. Not a pitch deck.
 
 ---
 
+**Live App:** [neural-stake.vercel.app](https://neural-stake.vercel.app)  
 **GitHub:** [github.com/intenceheat/neural-stake](https://github.com/intenceheat/neural-stake)  
-
-Built for Indie.fun Hackathon | December 2025
-
----
+**Demo:** [youtu.be/lFu8grnuiL4](https://youtu.be/lFu8grnuiL4)

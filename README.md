@@ -1,6 +1,6 @@
 # NEURAL STAKE
 
-> Where conviction meets capital.
+> Conviction-backed prediction markets on Solana.
 
 **CONVICTION IS CAPITAL**  
 AI-powered prediction markets. Stake your belief. Bank your edge.
@@ -10,24 +10,24 @@ AI-powered prediction markets. Stake your belief. Bank your edge.
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-**🏆 Built for Indie.fun Hackathon | Prediction Markets Track**
+Prediction market platform where you stake SOL on real-world outcomes and AI does the heavy lifting. Built on Solana for speed, powered by Claude for intelligence. Track positions live, watch P&L move in real-time, climb leaderboards, make calls backed by neural network analysis.
 
-Neural Stake is a prediction market platform where you stake SOL on real-world outcomes and let AI do the heavy lifting. Built on Solana for speed, powered by Claude for intelligence. Track your positions live, watch your P&L move in real-time, climb leaderboards, and make calls backed by neural network analysis — not guesswork.
+**Solo built. Zero compromises. Production-grade execution.**
 
 ---
 
-## 💻 Theater
+## 💻 Live Deployment
 
-- **Live App:** [neural-stake.vercel.app](https://neural-stake.vercel.app)
+- **App:** [neural-stake.vercel.app](https://neural-stake.vercel.app)
 - **Videos:**
-  - [Product Demo (UI Walkthrough)](https://youtu.be/lFu8grnuiL4)
-  - [Deep Dive (AI Narrated - 6min)](https://youtu.be/GbFQmryXQTE)
-  - [Quick Overview (AI Narrated - 2min)](https://youtu.be/cfZTEPUcQCE)
-- **Indie.fun:** [indie.fun/project-7QOD-42LW](https://indie.fun/project-7QOD-42LW)
+  - [Product Demo](https://youtu.be/lFu8grnuiL4)
+  - [Deep Dive (6min)](https://youtu.be/GbFQmryXQTE)
+  - [Quick Overview (2min)](https://youtu.be/cfZTEPUcQCE)
 - **GitHub:** [github.com/intenceheat/Neural-Stake](https://github.com/intenceheat/Neural-Stake)
+
 ---
 
-## 📸 Screenshots
+## 📸 Interface
 
 ### Nexus (Home)
 ![Nexus](docs/images/nexus.png)
@@ -58,7 +58,7 @@ Neural Stake is a prediction market platform where you stake SOL on real-world o
 - Platform statistics: total volume, active markets, elite operators
 - Recent activity feed with real-time updates
 - Phantom wallet integration with one-click connect
-- Responsive design with teal/cyan theme
+- Teal/cyan theme
 
 ### 💼 **Stakes (Positions)**
 - **Active positions** tracking with live P&L calculations
@@ -413,7 +413,7 @@ graph TB
 
 ### **Color-Coded Navigation**
 
-Each view has a unique color scheme that matches its navigation glyph, creating visual cohesion across the platform:
+Each view has a unique color scheme that matches its navigation glyph:
 
 | View | Glyph | waterColor | Header Gradient | Theme |
 |------|-------|------------|-----------------|-------|
@@ -846,7 +846,7 @@ neural-stake/
     └── init-markets.ts        # Market seeding
 ```
 
-### **Key Files Deep Dive**
+### **Key Files**
 
 **`lib/solana/oracle-program.ts`**
 - Anchor program initialization
@@ -885,25 +885,25 @@ neural-stake/
 
 ## 🤝 Contributing
 
-Priority areas:
+### **Priority Areas**
 
-### **High Priority**
-- [ ] Automated market resolution via Chainlink/Pyth oracles
-- [ ] Mobile app (React Native + Solana Mobile SDK)
-- [ ] Additional AI models for sentiment (GPT-4, Gemini)
-- [ ] Mainnet deployment + audit coordination
+**High Priority:**
+- Automated market resolution via Chainlink/Pyth oracles
+- Mobile app (React Native + Solana Mobile SDK)
+- Additional AI models for sentiment (GPT-4, Gemini)
+- Mainnet deployment + audit coordination
 
-### **Medium Priority**
-- [ ] Additional market types (sports, politics, tech launches)
-- [ ] Liquidity mining incentives
-- [ ] Community-created markets with moderation
-- [ ] Advanced charting for Neural Edge
+**Medium Priority:**
+- Additional market types (sports, politics, tech launches)
+- Liquidity mining incentives
+- Community-created markets with moderation
+- Advanced charting for Neural Edge
 
-### **Low Priority**
-- [ ] Dark/light theme toggle
-- [ ] Multi-language support (i18n)
-- [ ] Social features (comments, reactions)
-- [ ] NFT rewards for top predictors
+**Low Priority:**
+- Dark/light theme toggle
+- Multi-language support (i18n)
+- Social features (comments, reactions)
+- NFT rewards for top predictors
 
 **To contribute:**
 1. Fork the repository
@@ -922,7 +922,7 @@ Priority areas:
 
 ## 📈 Roadmap
 
-### **Phase 1: Core Platform** ✅ (COMPLETE)
+### **Phase 1: Core Platform** ✅
 - [x] Solana program deployment (Anchor framework)
 - [x] Basic market creation and staking
 - [x] Position tracking with live P&L
@@ -932,7 +932,7 @@ Priority areas:
 - [x] Color-coded design system
 - [x] Mobile-responsive UI
 
-### **Phase 2: AI Integration** 🚧 (IN PROGRESS)
+### **Phase 2: AI Integration** 🚧
 - [x] Neural Edge view with real-time predictions
 - [x] Claude Sonnet 4 integration via Make.com
 - [x] Multi-timeframe technical analysis
@@ -967,48 +967,6 @@ Priority areas:
 
 ---
 
-## 🏆 Hackathon Submission
-
-### **Indie.fun Hackathon Criteria**
-
-**Product Quality & Execution** ⭐⭐⭐⭐⭐
-- 5 fully operational views with production-grade UI
-- Real AI integration (not mocked data)
-- On-chain smart contract deployed and functional
-- Mobile-first responsive design
-- Zero placeholder content
-
-**Technical Implementation** ⭐⭐⭐⭐⭐
-- Full-stack Solana integration with Anchor
-- AI-powered predictions via Claude Sonnet 4
-- Automated data pipeline with Make.com (9 modules)
-- Real-time database with triggers
-- Edge computing with Cloudflare Workers
-- React Context for state persistence
-
-**Originality & Concept** ⭐⭐⭐⭐⭐
-- First prediction market with integrated AI intelligence layer
-- Neural confidence scoring system (85-100% strong signals)
-- Multi-timeframe technical analysis (1h/24h/7d/30d)
-- Risk assessment with specific price targets
-- Color-coded navigation matching view themes
-
-**User Experience & Design** ⭐⭐⭐⭐⭐
-- Intuitive 5-view navigation system
-- One-click wallet connection
-- Real-time P&L tracking
-- Glass morphism aesthetic
-- Smooth animations and transitions
-- Mobile-optimized buttons and layouts
-
-**Vision & Narrative** ⭐⭐⭐⭐⭐
-- Democratizes prediction markets with AI assistance
-- Solana's speed enables instant settlement
-- Transparent on-chain execution builds trust
-- Future: Community governance, token launch, cross-chain expansion
-
----
-
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) for details
@@ -1017,9 +975,9 @@ MIT License - see [LICENSE](LICENSE) for details
 
 ## 🔗 Links
 
+- **Live App:** [neural-stake.vercel.app](https://neural-stake.vercel.app)
 - **GitHub:** [github.com/intenceheat/neural-stake](https://github.com/intenceheat/neural-stake)
-- **Video Theatre:** https://youtu.be/lFu8grnuiL4
-- **Indie.fun:** https://indie.fun/project-7QOD-42LW
+- **Demo Video:** [youtu.be/lFu8grnuiL4](https://youtu.be/lFu8grnuiL4)
 
 ---
 
@@ -1030,31 +988,19 @@ MIT License - see [LICENSE](LICENSE) for details
 
 ---
 
-## 🙏 Acknowledgments
+## 🙏 Stack Credits
 
-Built for the Indie.fun Hackathon and the Solana prediction market community.
-
-**Special thanks to:**
-- **Solana Foundation** for developer tooling and RPC infrastructure
-- **Anchor Framework** for smart contract development framework
-- **Supabase** for backend infrastructure and real-time database
-- **Claude AI (Anthropic)** for market analysis capabilities
-- **Make.com** for workflow automation platform
-- **Cloudflare** for edge computing and routing
-- **CoinMarketCap** for crypto market data API
-
-**Judges & Partners:**
-- Play Solana
-- Moddio
-- Indie.fun
-- Solana Gaming
-- icm.run
-- Addicteddotfun
+**Infrastructure:**
+- Solana Foundation - Developer tooling and RPC infrastructure
+- Anchor Framework - Smart contract development framework
+- Supabase - Backend infrastructure and real-time database
+- Claude AI (Anthropic) - Market analysis capabilities
+- Make.com - Workflow automation platform
+- Cloudflare - Edge computing and routing
+- CoinMarketCap - Crypto market data API
 
 ---
 
 **CONVICTION IS CAPITAL. STAKE YOUR EDGE.** 🎯
 
-**Solo runner. Zero theater. Built with precision.**
-
-**Made for Indie.fun Hackathon | December 2025**
+**Solo built. Zero theater. Production-grade execution.**
